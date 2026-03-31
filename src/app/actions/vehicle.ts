@@ -2,8 +2,12 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import path from "path";
-import fs from "fs/promises";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function createVehicle(formData: FormData) {
   const name = formData.get("name") as string;
@@ -21,20 +25,26 @@ export async function createVehicle(formData: FormData) {
 
   for (const file of files) {
     if (file.size > 0) {
-      const buffer = Buffer.from(await file.arrayBuffer());
+      const arrayBuffer = await file.arrayBuffer();
       const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "")}`;
-      const uploadDir = path.join(process.cwd(), "public", "uploads");
       
-      try {
-        await fs.access(uploadDir);
-      } catch {
-        await fs.mkdir(uploadDir, { recursive: true });
+      const { data, error } = await supabase.storage
+        .from("veiculos")
+        .upload(fileName, arrayBuffer, {
+          contentType: file.type,
+          upsert: false
+        });
+
+      if (error) {
+        console.error("Error uploading image:", error);
+        throw new Error("Erro ao subir imagem para o Supabase");
       }
 
-      const filePath = path.join(uploadDir, fileName);
-      await fs.writeFile(filePath, buffer);
-      
-      imageUrls.push(`/uploads/${fileName}`);
+      const { data: { publicUrl } } = supabase.storage
+        .from("veiculos")
+        .getPublicUrl(fileName);
+        
+      imageUrls.push(publicUrl);
     }
   }
 
