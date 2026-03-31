@@ -6,6 +6,8 @@ import styles from "./page.module.css";
 import Header from "@/components/Header";
 import ImageGallery from "@/components/ImageGallery";
 
+export const dynamic = "force-dynamic";
+
 export default async function VehicleDetailPage({
   params,
 }: {

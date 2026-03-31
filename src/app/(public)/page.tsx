@@ -2,6 +2,8 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const profile = await prisma.profile.findFirst() || {
     name: "Eduardo Junqueira",
