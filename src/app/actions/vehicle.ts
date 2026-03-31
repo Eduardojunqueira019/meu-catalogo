@@ -50,8 +50,13 @@ export async function uploadVehicleImage(formData: FormData) {
       
     return { success: true, url: publicUrl };
   } catch (error: any) {
-    console.error("Error in uploadVehicleImage:", error);
-    return { success: false, error: error.message || "Erro no upload." };
+    console.error("V-ACTION-ERROR [uploadVehicleImage]:", error);
+    
+    let errorMsg = "Falha no servidor ao processar imagem.";
+    if (error.message?.includes("413")) errorMsg = "A foto é muito grande para o servidor. Tente diminuir a resolução.";
+    if (error.status === 403) errorMsg = "Erro de permissão no armazenamento (Storage).";
+    
+    return { success: false, error: `[UPLOAD-FAIL] ${errorMsg} (${error.message || 'Error'})` };
   }
 }
  

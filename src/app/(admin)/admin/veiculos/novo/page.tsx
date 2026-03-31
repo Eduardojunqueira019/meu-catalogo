@@ -79,6 +79,48 @@ export default function NovoVeiculoPage() {
     }
   };
 
+  const compressImage = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          let width = img.width;
+          let height = img.height;
+          
+          // Redimensionar para max 1200px largura (mantém proporção)
+          const MAX_WIDTH = 1200;
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            } else {
+              resolve(file); // Fallback se falhar
+            }
+          }, "image/jpeg", 0.75); // Qualidade 75%
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+ 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -86,20 +128,27 @@ export default function NovoVeiculoPage() {
     
     setLoading(true);
     setUploadStatus("Iniciando processo...");
-
+ 
     try {
       const imagesInput = form.querySelector('input[name="images"]') as HTMLInputElement;
       const files = imagesInput?.files ? Array.from(imagesInput.files) : [];
       const imageUrls: string[] = [];
-
+ 
       // 1. Upload das Imagens uma por uma
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
+          setUploadStatus(`Otimizando foto ${i + 1} de ${files.length}...`);
+          
+          // COMPRESSÃO NO NAVEGADOR
+          const fileToUpload = files[i].type.startsWith("image/") 
+            ? await compressImage(files[i]) 
+            : files[i];
+ 
           setUploadStatus(`Subindo foto ${i + 1} de ${files.length}...`);
           
           const imageFormData = new FormData();
-          imageFormData.append("image", files[i]);
-
+          imageFormData.append("image", fileToUpload);
+ 
           const uploadResult = await uploadVehicleImage(imageFormData);
           
           if (!uploadResult.success) {
@@ -107,10 +156,13 @@ export default function NovoVeiculoPage() {
           }
           
           if (uploadResult.url) imageUrls.push(uploadResult.url);
+          
+          // Pequena pausa pro servidor respirar (opcional)
+          await new Promise(r => setTimeout(r, 200));
         }
       }
-
-      setUploadStatus("Salvando dados do veículo...");
+ 
+      setUploadStatus("Salvando catálogo...");
 
       // 2. Criação do Veículo no Banco
       const vehicleData = {
