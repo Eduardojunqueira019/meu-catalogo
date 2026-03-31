@@ -40,15 +40,15 @@ export default async function VehicleDetailPage({
   const wppHref = `https://wa.me/55${wppNumber}?text=${wppMessage}`;
 
   return (
-    <div className={styles.detailContainer}>
+    <div className={styles.detailContainer} style={{ paddingBottom: "100px" }}>
       <div style={{ backgroundColor: "var(--primary)" }}>
          <Header title={vehicle.name} backTo="/catalogo" color="white" />
       </div>
-
+ 
       <div className={styles.detailContent}>
-
+ 
         <ImageGallery images={images} alt={vehicle.name} />
-
+ 
         <div className={styles.infoContent}>
         <div className={styles.specsGrid}>
           <div className={styles.specItem}>
@@ -76,7 +76,7 @@ export default async function VehicleDetailPage({
             <span className={styles.specValue}>{vehicle.year}</span>
           </div>
         </div>
-
+ 
         <div className={styles.optionsSection}>
           <h3 className={styles.optionsTitle}>Opcionais do Veículo</h3>
           <div className={styles.divider} style={{ margin: "10px 0 20px 0" }}></div>
@@ -99,7 +99,7 @@ export default async function VehicleDetailPage({
         <div className={styles.description}>
           {vehicle.description}
         </div>
-
+ 
         <div className={styles.actionButtons}>
           <a href={wppHref} target="_blank" rel="noopener noreferrer" className="btn-primary green" style={{ gap: "10px", backgroundColor: "#34A853" }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
@@ -107,13 +107,20 @@ export default async function VehicleDetailPage({
             </svg>
             Falar no WhatsApp
           </a>
-
+ 
           <Link href={`/catalogo/${vehicle.id}/simulacao`} className="btn-primary" style={{ display: "flex", justifyContent: "space-between" }}>
             <span>Simular Financiamento</span>
             <span>&gt;</span>
           </Link>
         </div>
       </div>
+      </div>
+ 
+      {/* Footer Fixo Mobile */}
+      <div className={styles.stickyBar}>
+        <a href={wppHref} target="_blank" rel="noopener noreferrer" className="btn-primary green" style={{ width: "100%", height: "50px", backgroundColor: "#34A853" }}>
+          Falar com Vendedor
+        </a>
       </div>
     </div>
   );
