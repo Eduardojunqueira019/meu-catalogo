@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import styles from "./SimulacaoForm.module.css";
-import { Loader2, Lock, CarFront, HelpCircle } from "lucide-react";
+import { Loader2, Lock, CarFront, HelpCircle, CheckCircle } from "lucide-react";
 
 export type SelectableVehicle = { id: string; name: string; year: number; price: number; };
 
@@ -32,6 +32,9 @@ export default function SimulacaoForm({
     let { name, value } = e.target;
     if (name === "whatsapp") value = value.replace(/\D/g, "").replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
     if (name === "cpf") value = value.replace(/\D/g, "").replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    if (name === "birthDate") {
+      value = value.replace(/\D/g, "").replace(/(\d{2})(\d{2})(\d{4})/, "$1/$2/$3");
+    }
     if (name === "zipCode") {
       value = value.replace(/\D/g, "").replace(/(\d{5})(\d{3})/, "$1-$2");
     }
@@ -73,6 +76,11 @@ export default function SimulacaoForm({
         });
         setLoading(false);
         setStep(5);
+        
+        // ENVIO AUTOMÁTICO PARA WHATSAPP
+        setTimeout(() => {
+          openWhatsApp(formData);
+        }, 500);
       } catch (err) {
         alert("Erro ao enviar dados, tente novamente");
         setLoading(false);
@@ -80,27 +88,27 @@ export default function SimulacaoForm({
     }
   };
 
-  const openWhatsApp = () => {
+  const openWhatsApp = (currentData = formData) => {
     const number = "5535984356108";
     const commonData = `
 👤 *Dados Pessoais:*
-Nome: ${formData.name}
-WhatsApp: ${formData.whatsapp}
-CPF: ${formData.cpf} | RG: ${formData.rg}
-CNH: ${formData.hasCnh === "sim" ? "Sim" : "Não"}
-Mãe: ${formData.motherName}
-Nasc: ${formData.birthDate.split('-').reverse().join('/')}
-Estado Civil: ${formData.maritalStatus}
+Nome: ${currentData.name}
+WhatsApp: ${currentData.whatsapp}
+CPF: ${currentData.cpf} | RG: ${currentData.rg}
+CNH: ${currentData.hasCnh === "sim" ? "Sim" : "Não"}
+Mãe: ${currentData.motherName}
+Nasc: ${currentData.birthDate}
+Estado Civil: ${currentData.maritalStatus}
 
 💰 *Financeiro:*
-Renda: ${formData.income}
-Entrada: ${formData.hasDownPayment === "sim" ? formData.downPayment : "Não possui"}
+Renda: ${currentData.income}
+Entrada: ${currentData.hasDownPayment === "sim" ? currentData.downPayment : "Não possui"}
 
 📍 *Endereço:*
-CEP: ${formData.zipCode}
-${formData.street}, ${formData.number}
-${formData.neighborhood}
-${formData.city}
+CEP: ${currentData.zipCode}
+${currentData.street}, ${currentData.number}
+${currentData.neighborhood}
+${currentData.city}
 `;
     
     let vehicleText = "Ainda não definido";
@@ -286,7 +294,7 @@ ${formData.city}
           </div>
           <div className={styles.inputGroup}>
             <label>Data de Nascimento</label>
-            <input required type="date" name="birthDate" value={formData.birthDate} onChange={handleChange} />
+            <input required type="text" name="birthDate" placeholder="DD/MM/AAAA" value={formData.birthDate} onChange={handleChange} maxLength={10} />
           </div>
           <div className={styles.inputGroup}>
             <label>Estado Civil</label>
@@ -338,15 +346,18 @@ ${formData.city}
       );
       case 5: return (
         <div style={{ textAlign: "center", padding: "20px 0" }}>
-          <h3 className={styles.formTitleSmall} style={{ color: "var(--primary)" }}>Recebemos seus dados!</h3>
+          <div style={{ background: "#dcfce7", padding: "16px", borderRadius: "12px", marginBottom: "20px" }}>
+            <CheckCircle color="#166534" size={40} style={{ margin: "0 auto 12px" }} />
+            <h3 className={styles.formTitleSmall} style={{ color: "#166534" }}>Enviado com sucesso!</h3>
+          </div>
           <p className={styles.formSubtitle} style={{ marginTop: "8px", borderBottom: "1px solid var(--border-color)", paddingBottom: "20px" }}>
-            Estamos analisando sua simulação.
+            Você será redirecionado para o WhatsApp em instantes...
           </p>
 
           <h2 style={{ fontSize: "1.2rem", fontWeight: "700", marginTop: "25px", color: "var(--text-dark)" }}>Obrigado!</h2>
-          <p style={{ fontWeight: "600", color: "var(--primary)", marginTop: "10px", marginBottom: "30px" }}>Fale comigo agora no WhatsApp</p>
+          <p style={{ fontWeight: "600", color: "var(--primary)", marginTop: "10px", marginBottom: "30px" }}>Clique abaixo se não for redirecionado:</p>
 
-          <button type="button" onClick={openWhatsApp} className="btn-primary green">
+          <button type="button" onClick={() => openWhatsApp()} className="btn-primary green">
             Falar com Eduardo no WhatsApp
           </button>
         </div>

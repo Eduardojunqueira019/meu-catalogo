@@ -22,7 +22,10 @@ export default async function CatalogoPage({
   const whereClause: any = { status: "disponivel" };
   
   if (typeFilter !== "Todos") {
-    whereClause.type = typeFilter;
+    whereClause.type = {
+      equals: typeFilter.toLowerCase(),
+      mode: "insensitive"
+    };
   }
 
   if (query) {

@@ -1,7 +1,7 @@
 "use client";
 import { saveProfile } from "./actions";
 import { useState } from "react";
-import { Save, CheckCircle, Camera } from "lucide-react";
+import { Save, CheckCircle, Camera, CarFront } from "lucide-react";
 
 export default function ProfileForm({ profile }: { profile: any }) {
   const [loading, setLoading] = useState(false);
@@ -154,6 +154,22 @@ export default function ProfileForm({ profile }: { profile: any }) {
           <label style={labelStyle}>Nome da Loja / Agência</label>
           <input type="text" name="storeName" defaultValue={profile?.storeName || ""} placeholder="Ex: Agência Campos" required style={inputStyle} />
           
+          <label style={labelStyle}>Logomarca da Agência</label>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px", background: "#f8fafc", padding: "16px", borderRadius: "12px", border: "1px dashed var(--border-color)" }}>
+            <div style={{ width: "80px", height: "80px", backgroundColor: "white", borderRadius: "8px", border: "1px solid var(--border-color)", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {profile?.storeLogoUrl ? (
+                <img src={profile.storeLogoUrl} alt="Logo" style={{ maxWidth: "100%", maxHeight: "100%" }} />
+              ) : (
+                <CarFront size={30} color="#cbd5e1" />
+              )}
+            </div>
+            <div>
+              <input type="file" name="logo" accept="image/*" style={{ fontSize: "0.85rem" }} />
+              <input type="hidden" name="logoUrl" value={profile?.storeLogoUrl || ""} />
+              <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "4px" }}>Recomendado: 512x512px (PNG ou JPG)</p>
+            </div>
+          </div>
+ 
           <label style={labelStyle}>Endereço Completo</label>
           <input type="text" name="address" defaultValue={profile?.address || ""} placeholder="Rua, número, bairro" required style={inputStyle} />
           

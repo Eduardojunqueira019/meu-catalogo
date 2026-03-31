@@ -13,22 +13,37 @@ export default function CatalogFooter({ profile }: { profile: any }) {
     }}>
       <div style={{ maxWidth: "600px", margin: "0 auto" }}>
         <div style={{ marginBottom: "32px" }}>
-          <h3 style={{ 
-            color: "var(--text-dark)", 
-            marginBottom: "8px", 
-            fontSize: "1.3rem", 
-            fontWeight: "800",
-            letterSpacing: "-0.5px"
-          }}>
-            {profile.storeName}
-          </h3>
-          <div style={{ 
-            width: "40px", 
-            height: "3px", 
-            background: "var(--primary)", 
-            margin: "0 auto",
-            borderRadius: "2px"
-          }}></div>
+          {profile.storeLogoUrl ? (
+            <img 
+              src={profile.storeLogoUrl} 
+              alt={profile.storeName} 
+              style={{ 
+                height: "80px", 
+                width: "auto", 
+                marginBottom: "16px",
+                objectFit: "contain"
+              }} 
+            />
+          ) : (
+            <>
+              <h3 style={{ 
+                color: "var(--text-dark)", 
+                marginBottom: "8px", 
+                fontSize: "1.3rem", 
+                fontWeight: "800",
+                letterSpacing: "-0.5px"
+              }}>
+                {profile.storeName}
+              </h3>
+              <div style={{ 
+                width: "40px", 
+                height: "3px", 
+                background: "var(--primary)", 
+                margin: "0 auto",
+                borderRadius: "2px"
+              }}></div>
+            </>
+          )}
         </div>
 
         <div style={{ marginBottom: "32px", lineHeight: "1.6" }}>

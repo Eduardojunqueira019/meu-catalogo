@@ -77,6 +77,7 @@ model Profile {
   instagram   String   @default("")
   facebook    String?  @default("")
   storeName   String   @default("Agência Campos")
+  storeLogoUrl String?  @default("")
   address     String   @default("")
   city        String   @default("")
   bio         String   @default("Te ajudo a encontrar e financiar o carro ideal com segurança")
