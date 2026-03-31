@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Vehicle {
+  id          String   @id @default(uuid())
+  name        String
+  price       Float
+  year        Int
+  km          Int
+  gearbox     String   // Câmbio
+  type        String   // hatch, sedan, SUV
+  options     String   // Opcionais (JSON ou string separada por vírgulas)
+  description String
+  images      String   // JSON string of arrays
+  status      String   @default("disponivel") // disponivel, vendido
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  leads       Lead[]
+}
+
+model Lead {
+  id            String   @id @default(uuid())
+  name          String
+  whatsapp      String
+  
+  // Relação com o veículo
+  vehicleId     String?
+  vehicle       Vehicle? @relation(fields: [vehicleId], references: [id])
+  
+  // Perfil financeiro
+  income        String?
+  hasDownPayment Boolean?
+  downPayment   String? 
+
+  // Dados Pessoais
+  cpf           String?
+  rg            String?
+  hasCnh        String?
+  motherName    String?
+  birthDate     String?
+  maritalStatus String?
+  
+  // Endereço
+  zipCode       String?
+  street        String?
+  number        String?
+  neighborhood  String?
+  city          String?
+  
+  // Profissionais
+  profession    String?
+  company       String?
+  workTime      String?
+  jobType       String?
+  email         String?
+
+  status        String   @default("novo") 
+  createdAt     DateTime @default(now())
+}
+
+model Profile {
+  id          String   @id @default(uuid())
+  name        String   @default("Eduardo Junqueira")
+  role        String   @default("Vendedor de Veículos")
+  whatsapp    String   @default("")
+  instagram   String   @default("")
+  facebook    String?  @default("")
+  storeName   String   @default("Agência Campos")
+  address     String   @default("")
+  city        String   @default("")
+  bio         String   @default("Te ajudo a encontrar e financiar o carro ideal com segurança")
+  photoUrl    String   @default("/placeholder-user.jpg")
+  updatedAt   DateTime @updatedAt
+}

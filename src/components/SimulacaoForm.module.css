@@ -1,0 +1,213 @@
+.formContainerWrapper {
+  flex: 1;
+  padding: 20px 15px;
+  background-color: var(--bg-color);
+  display: flex;
+  justify-content: center;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  border-radius: 4px;
+  padding: 30px 24px;
+  border: 1px solid var(--border-color);
+}
+
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.progressText {
+  color: var(--text-light);
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+
+.segmentsContainer {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.segment {
+  height: 2px;
+  flex: 1;
+  background-color: var(--border-color);
+}
+
+.segmentActive {
+  background-color: var(--primary);
+}
+
+.stepHeader {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.formTitle {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.formTitleSmall {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.formSubtitle {
+  color: var(--text-dark);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inputGroup label {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.inputGroup input {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.inputGroup input:disabled {
+  background-color: var(--bg-color);
+  opacity: 0.6;
+}
+
+.inputGroupNoLabel input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.inputGroupNoLabel input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.selectNative {
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background-color: white;
+  color: var(--text-dark);
+}
+
+.cepWrapper {
+  display: flex;
+}
+
+.cepWrapper input {
+  flex: 1;
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btnSearchCep {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0 20px;
+  font-weight: 600;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+  cursor: pointer;
+}
+
+.radioGroup {
+  display: flex;
+  gap: 40px;
+  padding: 6px 0;
+}
+
+.radioBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.radioCircle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  position: relative;
+}
+
+.radioSelected::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--primary);
+}
+
+.footerInfo {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.75rem;
+}
+
+.footerSecure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  margin-top: 10px;
+}
+
+.footerSecure span {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  text-align: left;
+  line-height: 1.3;
+}

@@ -1,0 +1,156 @@
+.homeContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.headerHero {
+  background-color: var(--primary);
+  height: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcomeText {
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-top: -40px;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+}
+
+.profileSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: -60px; /* Overlaps wave */
+  position: relative;
+  z-index: 10;
+  padding: 0 20px;
+  gap: 20px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.avatarImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #eff6ff;
+  border: 4px solid white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231d4ed8"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+  background-size: 80%;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.profileText {
+  display: flex;
+  flex-direction: column;
+}
+
+.profileText h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-dark);
+}
+
+.jobTitle {
+  font-size: 0.9rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.midSection {
+  padding: 40px 20px;
+  text-align: center;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.helperText {
+  font-size: 1.15rem;
+  color: var(--text-dark);
+  font-weight: 600;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
+  .headerHero {
+    height: 300px;
+  }
+  .buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+  .buttons > a {
+    flex: 1;
+    max-width: 300px;
+  }
+}
+
+.footerSection {
+  position: relative;
+  padding: 30px 20px 20px;
+  overflow: hidden;
+}
+
+.footerWaves {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at bottom, var(--primary-light) 0%, transparent 60%);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.footerContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.wppIcon {
+  width: 40px;
+  height: 40px;
+  background-color: #34A853;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footerContent p {
+  font-size: 0.9rem;
+  color: var(--text-dark);
+}
+
+.footerContent strong {
+  color: var(--primary);
+}
