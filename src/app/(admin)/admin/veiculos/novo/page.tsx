@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { createVehicle } from "@/app/actions/vehicle";
-import { ChevronLeft, Save, Loader2, ImagePlus, Zap, Sparkles, Bot, Flame, Diamond, Link as LinkIcon, Download } from "lucide-react";
+import { createVehicle, uploadVehicleImage } from "@/app/actions/vehicle";
+import { ChevronLeft, Save, Loader2, ImagePlus, Zap, Sparkles, Bot, Flame, Diamond, Link as LinkIcon, Download, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function NovoVeiculoPage() {
   const [loading, setLoading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const router = useRouter();
 
@@ -81,17 +82,56 @@ export default function NovoVeiculoPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
-    setLoading(true);
-    
     const formData = new FormData(form);
+    
+    setLoading(true);
+    setUploadStatus("Iniciando processo...");
+
     try {
-      const result = await createVehicle(formData);
+      const imagesInput = form.querySelector('input[name="images"]') as HTMLInputElement;
+      const files = imagesInput?.files ? Array.from(imagesInput.files) : [];
+      const imageUrls: string[] = [];
+
+      // 1. Upload das Imagens uma por uma
+      if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          setUploadStatus(`Subindo foto ${i + 1} de ${files.length}...`);
+          
+          const imageFormData = new FormData();
+          imageFormData.append("image", files[i]);
+
+          const uploadResult = await uploadVehicleImage(imageFormData);
+          
+          if (!uploadResult.success) {
+            throw new Error(uploadResult.error || `Erro no upload da foto ${i + 1}`);
+          }
+          
+          if (uploadResult.url) imageUrls.push(uploadResult.url);
+        }
+      }
+
+      setUploadStatus("Salvando dados do veículo...");
+
+      // 2. Criação do Veículo no Banco
+      const vehicleData = {
+        name: formData.get("name") as string,
+        price: Number(formData.get("price")),
+        year: Number(formData.get("year")),
+        km: Number(formData.get("km")),
+        gearbox: formData.get("gearbox") as string,
+        type: formData.get("type") as string,
+        options: formData.get("options") as string,
+        description: formData.get("description") as string,
+        status: formData.get("status") as string,
+        imageUrls
+      };
+
+      const result = await createVehicle(vehicleData);
       
       if (result.success) {
-        // Limpar todos os campos e estados
+        setUploadStatus("Sucesso!");
         form.reset();
         
-        // Limpar estados do React
         setVehicleName("");
         setPreviewUrls([]);
         setSelectedBrand("");
@@ -99,7 +139,6 @@ export default function NovoVeiculoPage() {
         setBrands([]);
         setModels([]);
         
-        // Limpar Referências manuais (Refs)
         if (descriptionRef.current) descriptionRef.current.value = "";
         if (optionsRef.current) optionsRef.current.value = "";
         if (priceRef.current) priceRef.current.value = "";
@@ -107,16 +146,16 @@ export default function NovoVeiculoPage() {
         if (yearRef.current) yearRef.current.value = "";
         if (importUrlRef.current) importUrlRef.current.value = "";
 
-        // Alerta de sucesso apenas no final
-        alert("✅ Veículo salvo e publicado com sucesso no catálogo!");
+        alert("✅ Veículo salvo e publicado com sucesso!");
       } else {
         alert("❌ Erro ao salvar veículo: " + (result.error || "Tente novamente."));
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Erro técnico ao salvar o veículo.");
+      alert("Erro ao salvar: " + err.message);
     } finally {
       setLoading(false);
+      setUploadStatus("");
     }
   };
 
@@ -388,7 +427,7 @@ export default function NovoVeiculoPage() {
 
         <button type="submit" disabled={loading} className="btn-primary" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "8px", marginTop: "16px" }}>
           {loading ? <Loader2 className="animate-spin" /> : <Save size={20} />}
-          {loading ? "Salvando..." : "Salvar Veículo e Publicar"}
+          {loading ? (uploadStatus || "Salvando...") : "Salvar Veículo e Publicar"}
         </button>
       </form>
     </div>

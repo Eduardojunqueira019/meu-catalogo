@@ -24,45 +24,53 @@ export async function deleteVehicle(id: string) {
   }
 }
  
-export async function createVehicle(formData: FormData) {
+export async function uploadVehicleImage(formData: FormData) {
   try {
-    const name = formData.get("name") as string;
-    const price = Number(formData.get("price"));
-    const year = Number(formData.get("year"));
-    const km = Number(formData.get("km"));
-    const gearbox = formData.get("gearbox") as string;
-    const type = formData.get("type") as string;
-    const options = formData.get("options") as string;
-    const description = formData.get("description") as string;
-    const status = formData.get("status") as string;
- 
-    const files = formData.getAll("images") as File[];
-    const imageUrls: string[] = [];
- 
-    for (const file of files) {
-      if (file.size > 0) {
-        const arrayBuffer = await file.arrayBuffer();
-        const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "")}`;
-        
-        const { data, error } = await supabase.storage
-          .from("veiculos")
-          .upload(fileName, arrayBuffer, {
-            contentType: file.type,
-            upsert: false
-          });
- 
-        if (error) {
-          console.error("Error uploading image:", error);
-          throw new Error("Erro ao subir imagem para o Supabase");
-        }
- 
-        const { data: { publicUrl } } = supabase.storage
-          .from("veiculos")
-          .getPublicUrl(fileName);
-          
-        imageUrls.push(publicUrl);
-      }
+    const file = formData.get("image") as File;
+    if (!file || file.size === 0) throw new Error("Imagem não fornecida.");
+
+    const arrayBuffer = await file.arrayBuffer();
+    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, "")}`;
+    
+    const { data, error } = await supabase.storage
+      .from("veiculos")
+      .upload(fileName, arrayBuffer, {
+        contentType: file.type,
+        upsert: false
+      });
+
+    if (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Erro ao subir imagem para o Supabase");
     }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("veiculos")
+      .getPublicUrl(fileName);
+      
+    return { success: true, url: publicUrl };
+  } catch (error: any) {
+    console.error("Error in uploadVehicleImage:", error);
+    return { success: false, error: error.message || "Erro no upload." };
+  }
+}
+ 
+export interface CreateVehicleInput {
+  name: string;
+  price: number;
+  year: number;
+  km: number;
+  gearbox: string;
+  type: string;
+  options: string;
+  description: string;
+  status: string;
+  imageUrls: string[];
+}
+ 
+export async function createVehicle(input: CreateVehicleInput) {
+  try {
+    const { name, price, year, km, gearbox, type, options, description, status, imageUrls } = input;
  
     await prisma.vehicle.create({
       data: {
