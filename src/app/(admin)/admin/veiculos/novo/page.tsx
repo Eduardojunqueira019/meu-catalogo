@@ -125,7 +125,7 @@ export default function NovoVeiculoPage() {
         status: formData.get("status") as string,
         imageUrls
       };
-
+ 
       const result = await createVehicle(vehicleData);
       
       if (result.success) {
@@ -145,14 +145,20 @@ export default function NovoVeiculoPage() {
         if (kmRef.current) kmRef.current.value = "";
         if (yearRef.current) yearRef.current.value = "";
         if (importUrlRef.current) importUrlRef.current.value = "";
-
+ 
         alert("✅ Veículo salvo e publicado com sucesso!");
       } else {
         alert("❌ Erro ao salvar veículo: " + (result.error || "Tente novamente."));
       }
     } catch (err: any) {
-      console.error(err);
-      alert("Erro ao salvar: " + err.message);
+      console.error("Erro capturado no submit:", err);
+      
+      let msg = err.message || "Erro desconhecido.";
+      if (msg.includes("Server Components render") || msg.includes("digest")) {
+        msg = "O servidor teve um problema ao processar o banco de dados (Digest Error). Tente novamente em alguns instantes ou verifique os campos.";
+      }
+      
+      alert("Erro ao salvar: " + msg);
     } finally {
       setLoading(false);
       setUploadStatus("");

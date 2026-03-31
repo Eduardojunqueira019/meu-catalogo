@@ -70,9 +70,20 @@ export interface CreateVehicleInput {
  
 export async function createVehicle(input: CreateVehicleInput) {
   try {
-    const { name, price, year, km, gearbox, type, options, description, status, imageUrls } = input;
+    // 1. Validar e Coagir Entradas (Evitar NaN/Null que travam o Prisma)
+    const name = input.name || "Veículo Sem Nome";
+    const price = Number(input.price) || 0;
+    const year = Number(input.year) || new Date().getFullYear();
+    const km = Number(input.km) || 0;
+    const gearbox = input.gearbox || "Manual";
+    const type = input.type || "sedan";
+    const options = input.options || "";
+    const description = input.description || "";
+    const status = input.status || "disponivel";
+    const imageUrls = Array.isArray(input.imageUrls) ? input.imageUrls : [];
  
-    await prisma.vehicle.create({
+    // 2. Criar no Banco de Dados
+    const result = await prisma.vehicle.create({
       data: {
         name,
         price,
@@ -87,11 +98,27 @@ export async function createVehicle(input: CreateVehicleInput) {
       }
     });
  
-    revalidatePath("/catalogo");
-    revalidatePath("/admin");
-    return { success: true };
+    // 3. Revalidação de Cache
+    try {
+      revalidatePath("/catalogo");
+      revalidatePath("/admin");
+    } catch (revalidateError) {
+      console.warn("Aviso: Falha na revalidação, mas o veículo foi salvo.", revalidateError);
+    }
+ 
+    return { success: true, id: result.id };
   } catch (error: any) {
-    console.error("Error creating vehicle:", error);
-    return { success: false, error: error.message || "Erro desconhecido ao salvar." };
+    console.error("V-ACTION-ERROR [createVehicle]:", error);
+    
+    // Capturar mensagens específicas do Prisma para ajudar no debug
+    let userMessage = "Erro desconhecido ao salvar o veículo.";
+    if (error.code === 'P2002') userMessage = "Erro: Já existe um veículo similar registrado.";
+    if (error.message?.includes("Can't reach database")) userMessage = "Erro de conexão: Banco de dados inacessível.";
+    
+    return { 
+      success: false, 
+      error: userMessage,
+      digest: error.digest // Manter suporte ao digest do Next.js se existir
+    };
   }
 }
