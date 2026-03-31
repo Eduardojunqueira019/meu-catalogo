@@ -24,14 +24,14 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      <div style={{ background: "white", borderRadius: "12px", boxShadow: "var(--box-shadow)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
+      <div className="table-container" style={{ background: "white", borderRadius: "12px", boxShadow: "var(--box-shadow)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
         {vehicles.length === 0 ? (
           <div style={{ padding: "40px", textAlign: "center", color: "var(--text-light)" }}>
             <Search size={40} style={{ opacity: 0.3, margin: "0 auto 16px" }} />
             <p>Nenhum veículo cadastrado ainda.</p>
           </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "600px" }}>
             <thead>
               <tr style={{ background: "var(--bg-color)", borderBottom: "1px solid var(--border-color)" }}>
                 <th style={{ padding: "16px", fontWeight: "600", color: "var(--text-light)" }}>Veículo</th>
@@ -58,7 +58,8 @@ export default async function AdminDashboardPage() {
                       padding: "4px 12px", 
                       borderRadius: "20px", 
                       fontSize: "0.85rem", 
-                      fontWeight: "bold" 
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap"
                     }}>
                       {v.status === "disponivel" ? "Disponível" : "Vendido"}
                     </span>

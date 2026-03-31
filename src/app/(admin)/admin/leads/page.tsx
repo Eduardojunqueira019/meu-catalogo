@@ -27,7 +27,7 @@ export default async function LeadsPage() {
         ) : (
           leads.map((lead) => (
             <div key={lead.id} style={{ background: "white", borderRadius: "12px", padding: "24px", boxShadow: "var(--box-shadow)", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px" }}>
+              <div className="lead-card-header" style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px", gap: "16px", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
                   <div style={{ background: "var(--primary-light)", padding: "12px", borderRadius: "50%" }}><User color="var(--primary)" /></div>
                   <div>
@@ -35,7 +35,7 @@ export default async function LeadsPage() {
                     <p style={{ color: "var(--text-light)", fontSize: "0.9rem" }}>{lead.whatsapp}</p>
                   </div>
                 </div>
-                <div style={{ textAlign: "right" }}>
+                <div style={{ textAlign: "right", minWidth: "200px" }}>
                   <p style={{ fontSize: "0.85rem", color: "var(--text-light)" }}>Simulou pelo veículo:</p>
                   <Link href={`/catalogo/${lead.vehicleId}`} target="_blank" style={{ fontWeight: "700", color: "var(--primary)" }}>
                     {lead.vehicle?.name || "Veículo removido"}
@@ -45,8 +45,8 @@ export default async function LeadsPage() {
                   </p>
                 </div>
               </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", fontSize: "0.95rem" }}>
+ 
+              <div className="lead-card-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px", fontSize: "0.95rem" }}>
                 <div>
                   <strong style={{ color: "var(--text-dark)" }}>Perfil Financeiro:</strong>
                   <ul style={{ color: "var(--text-light)", marginLeft: "20px", marginTop: "4px" }}>

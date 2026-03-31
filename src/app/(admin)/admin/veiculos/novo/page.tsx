@@ -265,7 +265,7 @@ export default function NovoVeiculoPage() {
             <Zap size={20} /> Facilitador de Preenchimento Rápido
           </h2>
           <p style={{ fontSize: "0.85rem", color: "var(--text-light)", marginBottom: "16px" }}>Selecione abaixo para auto-completar o Nome oficial do Veículo.</p>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
             <select value={apiType} onChange={e => setApiType(e.target.value as "carros" | "motos")} style={{ padding: "12px", borderRadius: "6px", border: "1px solid var(--border-color)", backgroundColor: "white", fontSize: "0.9rem" }}>
               <option value="carros">Carro</option>
               <option value="motos">Moto</option>
@@ -281,7 +281,7 @@ export default function NovoVeiculoPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px", color: "var(--text-dark)" }}>Nome do Veículo *</label>
             <input required type="text" name="name" placeholder="Ex: Honda Civic EXL 2.0" value={vehicleName} onChange={e => setVehicleName(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-color)" }} />
@@ -292,7 +292,7 @@ export default function NovoVeiculoPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px", color: "var(--text-dark)" }}>Ano *</label>
             <input ref={yearRef} required type="number" name="year" placeholder="Ex: 2021" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-color)" }} />
@@ -310,7 +310,7 @@ export default function NovoVeiculoPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px", color: "var(--text-dark)" }}>Tipo *</label>
             <select required name="type" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-color)" }}>

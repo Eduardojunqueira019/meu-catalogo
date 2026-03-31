@@ -53,7 +53,7 @@ export default function ProfileForm({ profile }: { profile: any }) {
       border: "1px solid var(--border-color)",
       maxWidth: "900px"
     }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
+      <div className="responsive-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "40px" }}>
         {/* Personal Info */}
         <section>
           <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px", borderBottom: "2px solid #eff6ff", paddingBottom: "10px" }}>

@@ -75,3 +75,72 @@ button {
   justify-content: center;
   align-items: center;
 }
+ 
+/* Tabelas Responsivas */
+.table-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+ 
+/* Layout Admin Responsivo */
+@media (max-width: 768px) {
+  .admin-layout {
+    flex-direction: column !important;
+  }
+ 
+  .admin-sidebar {
+    position: fixed !important;
+    left: -280px;
+    top: 0;
+    bottom: 0;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    width: 280px !important;
+    height: 100vh !important;
+  }
+ 
+  .admin-sidebar.open {
+    left: 0;
+  }
+ 
+  .admin-sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    display: none;
+  }
+  
+  .admin-sidebar-overlay.open {
+    display: block;
+  }
+ 
+  .admin-main {
+    padding: 16px !important;
+    margin-top: 60px !important;
+    width: 100% !important;
+  }
+ 
+  .mobile-header {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: #1e293b;
+    color: white;
+    z-index: 998;
+    align-items: center;
+    padding: 0 16px;
+    justify-content: space-between;
+  }
+}
+ 
+.mobile-header {
+  display: none;
+}
