@@ -80,27 +80,38 @@ export default function NovoVeiculoPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setLoading(true);
     
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     try {
-      await createVehicle(formData);
-      alert("✅ Veículo salvo e publicado com sucesso no catálogo!");
+      const result = await createVehicle(formData);
       
-      // Limpar todos os campos
-      e.currentTarget.reset();
-      setVehicleName("");
-      setPreviewUrls([]);
-      setSelectedBrand("");
-      setSelectedModel("");
-      
-      if (descriptionRef.current) descriptionRef.current.value = "";
-      if (optionsRef.current) optionsRef.current.value = "";
-      if (priceRef.current) priceRef.current.value = "";
-      if (kmRef.current) kmRef.current.value = "";
-      if (yearRef.current) yearRef.current.value = "";
-      if (importUrlRef.current) importUrlRef.current.value = "";
+      if (result.success) {
+        // Limpar todos os campos e estados
+        form.reset();
+        
+        // Limpar estados do React
+        setVehicleName("");
+        setPreviewUrls([]);
+        setSelectedBrand("");
+        setSelectedModel("");
+        setBrands([]);
+        setModels([]);
+        
+        // Limpar Referências manuais (Refs)
+        if (descriptionRef.current) descriptionRef.current.value = "";
+        if (optionsRef.current) optionsRef.current.value = "";
+        if (priceRef.current) priceRef.current.value = "";
+        if (kmRef.current) kmRef.current.value = "";
+        if (yearRef.current) yearRef.current.value = "";
+        if (importUrlRef.current) importUrlRef.current.value = "";
 
+        // Alerta de sucesso apenas no final
+        alert("✅ Veículo salvo e publicado com sucesso no catálogo!");
+      } else {
+        alert("❌ Erro ao salvar veículo: " + (result.error || "Tente novamente."));
+      }
     } catch (err) {
       console.error(err);
       alert("Erro técnico ao salvar o veículo.");

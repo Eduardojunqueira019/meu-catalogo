@@ -1,8 +1,9 @@
 "use client";
 
-import { Link as LinkIcon, Share2, ExternalLink } from "lucide-react";
+import { Link as LinkIcon, Share2, ExternalLink, Trash2 } from "lucide-react";
+import { deleteVehicle } from "@/app/actions/vehicle";
 
-export default function VehicleActions({ id, name, year, price }: { id: string | number, name: string, year: string | number, price: number }) {
+export default function VehicleActions({ id, name, year, price }: { id: string, name: string, year: string | number, price: number }) {
   
   const handleCopy = () => {
     const url = `${window.location.origin}/catalogo/${id}`;
@@ -16,8 +17,22 @@ export default function VehicleActions({ id, name, year, price }: { id: string |
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
   }
 
+  const handleDelete = async () => {
+    if (confirm(`Tem certeza que deseja excluir o veículo "${name}" do estoque permanentemente?`)) {
+       const res = await deleteVehicle(id);
+       if (res.success) {
+          alert("✅ Veículo removido com sucesso!");
+       } else {
+          alert("❌ Erro ao excluir veículo.");
+       }
+    }
+  }
+
   return (
     <div style={{ display: "flex", gap: "8px", alignItems: "center", justifyContent: "flex-end" }}>
+      <button type="button" onClick={handleDelete} title="Excluir Veículo" style={{ background: "#fef2f2", color: "#ef4444", border: "1px solid #fecaca", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex", marginRight: "12px" }}>
+        <Trash2 size={16} />
+      </button>
       <a href={`/catalogo/${id}`} target="_blank" title="Ver no Catálogo" style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
         <ExternalLink size={16} />
       </a>
