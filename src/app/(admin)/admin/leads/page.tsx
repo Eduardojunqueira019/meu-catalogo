@@ -26,7 +26,34 @@ export default async function LeadsPage() {
           </div>
         ) : (
           leads.map((lead) => (
-            <div key={lead.id} style={{ background: "white", borderRadius: "12px", padding: "24px", boxShadow: "var(--box-shadow)", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div key={lead.id} style={{ 
+              background: "white", 
+              borderRadius: "12px", 
+              padding: "24px", 
+              boxShadow: lead.status === "novo" ? "0 4px 15px rgba(59, 130, 246, 0.15)" : "var(--box-shadow)", 
+              border: lead.status === "novo" ? "2px solid #3b82f6" : "1px solid var(--border-color)", 
+              display: "flex", 
+              flexDirection: "column", 
+              gap: "16px",
+              position: "relative"
+            }}>
+              {lead.status === "novo" && (
+                <div style={{
+                  position: "absolute",
+                  top: "-12px",
+                  right: "24px",
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  padding: "4px 12px",
+                  borderRadius: "20px",
+                  fontSize: "0.75rem",
+                  fontWeight: "800",
+                  letterSpacing: "0.05em",
+                  boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+                }}>
+                  NOVO LEAD
+                </div>
+              )}
               <div className="lead-card-header" style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px", gap: "16px", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
                   <div style={{ background: "var(--primary-light)", padding: "12px", borderRadius: "50%" }}><User color="var(--primary)" /></div>

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Filter, ArrowUpDown, Download, Eye, MessageSquare, AlertCircle, Clock, Trash2, ExternalLink, Share2 } from "lucide-react";
 import VehicleActions from "./VehicleActions";
 import styles from "./admin.module.css";
 import { formatCurrency } from "@/utils/format";
@@ -16,17 +16,35 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className={styles.adminContainer}>
-      {/* Header Summary */}
-      <div className={styles.summaryBar}>
-        {vehicleCount} {vehicleCount === 1 ? "VEÍCULO" : "VEÍCULOS"} EM ESTOQUE
-      </div>
+      {/* Header section with Search & Actions */}
+      <header className={styles.adminHeader}>
+        <div className={styles.titleLine}>
+          <h1 className={styles.pageTitle}>Veículos</h1>
+        </div>
 
-      <div className={styles.vehicleList}>
+        <div className={styles.searchToolbar}>
+          <div className={styles.searchWrapper}>
+            <Search className={styles.searchIcon} size={18} />
+            <input 
+              type="text" 
+              placeholder="Buscar por placa, modelo, marca..." 
+              className={styles.searchInput} 
+            />
+          </div>
+          <button className={styles.toolBtn} title="Filtrar"><Filter size={18} /></button>
+          <button className={styles.toolBtn} title="Ordenar"><ArrowUpDown size={18} /></button>
+          <button className={styles.toolBtn} title="Exportar"><Download size={18} /></button>
+        </div>
+        
+        <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0 }}>{vehicleCount} veículos</p>
+      </header>
+
+      {/* Vehicle Grid */}
+      <div className={styles.vehicleGrid}>
         {vehicles.length === 0 ? (
-          <div style={{ padding: "80px 40px", textAlign: "center", color: "var(--text-light)", background: "white" }}>
+          <div style={{ gridColumn: "1 / -1", padding: "80px 40px", textAlign: "center", color: "var(--text-light)", background: "white", borderRadius: "12px" }}>
             <Search size={48} style={{ opacity: 0.1, margin: "0 auto 16px" }} />
-            <p style={{ fontSize: "1.1rem", fontWeight: "600" }}>Nenhum veículo cadastrado.</p>
-            <p style={{ marginTop: "8px" }}>Toque no botão "+" para começar.</p>
+            <p style={{ fontSize: "1.1rem", fontWeight: "600" }}>Nenhum veículo no estoque.</p>
           </div>
         ) : (
           vehicles.map((v) => {
@@ -36,38 +54,58 @@ export default async function AdminDashboardPage() {
                 const images = JSON.parse(v.images);
                 if (images.length > 0) imageUrl = images[0];
               }
-            } catch (e) {
-              console.error("Error parsing images for vehicle", v.id, e);
-            }
+            } catch (e) {}
 
-            // In the screenshot, there is a plate. Since we don't have it, we use a 
-            // partial ID or KM as a placeholder to match the visual weight.
-            const platePlaceholder = v.km > 0 ? `${v.km.toLocaleString()} KM` : `ID-${v.id.substring(0, 4).toUpperCase()}`;
+            // Mocked labels to match the provided design
+            const plate = `PER-7C${v.id.substring(0, 2).toUpperCase()}`;
 
             return (
               <div key={v.id} className={styles.vehicleCard}>
-                {/* Image Section */}
-                <div className={styles.imageWrapper}>
-                  <img src={imageUrl} alt={v.name} className={styles.thumbnail} />
-                  <div className={styles.updatedTag}>Atualizado</div>
+                <div className={styles.cardMain}>
+                  {/* Left: Image Section */}
+                  <div className={styles.imageSection}>
+                    <div className={styles.imageOverlay}>{plate}</div>
+                    <img src={imageUrl} alt={v.name} className={styles.thumbnail} />
+                    <div className={styles.imageBadge}>PRÓPRIO</div>
+                  </div>
+
+                  {/* Right: Details Section */}
+                  <div className={styles.detailsSection}>
+                    <div className={styles.nameLine}>
+                      <h3 className={styles.vehicleName}>{v.name}</h3>
+                      <p className={styles.vehicleSub}>
+                        {v.gearbox} • {v.year}/{v.year} • {v.km.toLocaleString()} km
+                      </p>
+                    </div>
+
+                    <div className={styles.statusTags}>
+                      <span className={`${styles.tag} ${styles.tagPendente}`}>
+                        <Clock size={12} /> Negociação pendente
+                      </span>
+                      <span className={`${styles.tag} ${styles.tagProposta}`}>
+                        <MessageSquare size={12} /> Proposta Pendente
+                      </span>
+                    </div>
+
+                    <div className={styles.featuresRow}>
+                      <span className={styles.feature}>IPVA Pago</span>
+                      <span className={styles.feature}>Leilão</span>
+                      <span className={styles.feature}>Completo</span>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "auto" }}>
+                       <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
+                       <span style={{ fontSize: "1rem", fontWeight: "800", color: "#1e293b" }}>{formatCurrency(v.price)}</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Details Section */}
-                <div className={styles.details}>
-                  <div className={styles.titleLine}>
-                    <h3 className={styles.name}>{v.name} {v.year}</h3>
-                    <p className={styles.subtitle}>
-                      {v.gearbox} • {v.type.toUpperCase()} • {v.description.substring(0, 40)}{v.description.length > 40 ? "..." : ""}
-                    </p>
+                {/* Card Footer with Quick Actions */}
+                <div className={styles.cardFooter}>
+                  <div className={styles.storeInfo}>
+                     <Eye size={14} /> Minha Loja T1
                   </div>
-                  
-                  <div className={styles.infoLine}>
-                    <span className={styles.plate}>{platePlaceholder}</span>
-                    <span className={styles.price}>{formatCurrency(v.price)}</span>
-                  </div>
-
-                  {/* Quick Actions Integration */}
-                  <div className={styles.actionsRow}>
+                  <div className={styles.statsInfo}>
                     <VehicleActions id={v.id} name={v.name} year={v.year} price={v.price} />
                   </div>
                 </div>
@@ -84,4 +122,5 @@ export default async function AdminDashboardPage() {
     </div>
   );
 }
+
 
