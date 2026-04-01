@@ -23,6 +23,13 @@ model Vehicle {
   description String
   images      String   // JSON string of arrays
   status      String   @default("disponivel") // disponivel, vendido
+  
+  // Novas características dinâmicas
+  isLeilao    Boolean  @default(false)
+  isIpvaPago  Boolean  @default(false)
+  isAlienado  Boolean  @default(false)
+  isGarantia  Boolean  @default(false)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

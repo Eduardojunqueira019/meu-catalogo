@@ -61,46 +61,49 @@ export default async function AdminDashboardPage() {
 
             return (
               <div key={v.id} className={styles.vehicleCard}>
-                <div className={styles.cardMain}>
-                  {/* Left: Image Section */}
-                  <div className={styles.imageSection}>
-                    <div className={styles.imageOverlay}>{plate}</div>
-                    <img src={imageUrl} alt={v.name} className={styles.thumbnail} />
-                    <div className={styles.imageBadge}>PRÓPRIO</div>
+                <Link href={`/catalogo/${v.id}`} className={styles.cardClickableArea} target="_blank">
+                  <div className={styles.cardMain}>
+                    {/* Left: Image Section */}
+                    <div className={styles.imageSection}>
+                      <div className={styles.imageOverlay}>{plate}</div>
+                      <img src={imageUrl} alt={v.name} className={styles.thumbnail} />
+                      <div className={styles.imageBadge}>PRÓPRIO</div>
+                    </div>
+
+                    {/* Right: Details Section */}
+                    <div className={styles.detailsSection}>
+                      <div className={styles.nameLine}>
+                        <h3 className={styles.vehicleName}>{v.name}</h3>
+                        <p className={styles.vehicleSub}>
+                          {v.gearbox} • {v.year}/{v.year} • {v.km.toLocaleString()} km
+                        </p>
+                      </div>
+
+                      <div className={styles.statusTags}>
+                        {v.isIpvaPago && <span className={`${styles.tag} ${styles.tagIpva}`} title="IPVA Pago">📄 IPVA</span>}
+                        {v.isLeilao && <span className={`${styles.tag} ${styles.tagLeilao}`} title="Veículo de Leilão">🔨 Leilão</span>}
+                        {v.isAlienado && <span className={`${styles.tag} ${styles.tagAlienado}`} title="Possui Alienação">🏦 Alienado</span>}
+                        {v.isGarantia && <span className={`${styles.tag} ${styles.tagGarantia}`} title="Garantia de 3 meses">🛡️ Garantia</span>}
+                        
+                        {!v.isIpvaPago && !v.isLeilao && !v.isAlienado && !v.isGarantia && (
+                          <span className={styles.tag} style={{ opacity: 0.5 }}>Sem tags</span>
+                        )}
+                      </div>
+
+                      <div className={styles.featuresRow}>
+                        <span className={styles.feature}>Completo</span>
+                        <span className={styles.feature}>Estoque</span>
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "auto" }}>
+                        <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
+                        <span style={{ fontSize: "1rem", fontWeight: "800", color: "#1e293b" }}>{formatCurrency(v.price)}</span>
+                      </div>
+                    </div>
                   </div>
+                </Link>
 
-                  {/* Right: Details Section */}
-                  <div className={styles.detailsSection}>
-                    <div className={styles.nameLine}>
-                      <h3 className={styles.vehicleName}>{v.name}</h3>
-                      <p className={styles.vehicleSub}>
-                        {v.gearbox} • {v.year}/{v.year} • {v.km.toLocaleString()} km
-                      </p>
-                    </div>
-
-                    <div className={styles.statusTags}>
-                      <span className={`${styles.tag} ${styles.tagPendente}`}>
-                        <Clock size={12} /> Negociação pendente
-                      </span>
-                      <span className={`${styles.tag} ${styles.tagProposta}`}>
-                        <MessageSquare size={12} /> Proposta Pendente
-                      </span>
-                    </div>
-
-                    <div className={styles.featuresRow}>
-                      <span className={styles.feature}>IPVA Pago</span>
-                      <span className={styles.feature}>Leilão</span>
-                      <span className={styles.feature}>Completo</span>
-                    </div>
-
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "auto" }}>
-                       <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
-                       <span style={{ fontSize: "1rem", fontWeight: "800", color: "#1e293b" }}>{formatCurrency(v.price)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Footer with Quick Actions */}
+                {/* Card Footer stays separate for actions */}
                 <div className={styles.cardFooter}>
                   <div className={styles.storeInfo}>
                      <Eye size={14} /> Minha Loja T1

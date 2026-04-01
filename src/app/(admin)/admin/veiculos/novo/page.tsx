@@ -175,6 +175,10 @@ export default function NovoVeiculoPage() {
         options: formData.get("options") as string,
         description: formData.get("description") as string,
         status: formData.get("status") as string,
+        isLeilao: formData.get("isLeilao") === "on",
+        isIpvaPago: formData.get("isIpvaPago") === "on",
+        isAlienado: formData.get("isAlienado") === "on",
+        isGarantia: formData.get("isGarantia") === "on",
         imageUrls
       };
  
@@ -424,6 +428,29 @@ export default function NovoVeiculoPage() {
               <option value="disponivel">Disponível</option>
               <option value="vendido">Vendido</option>
             </select>
+          </div>
+        </div>
+
+        {/* Novas Características (Checkboxes) */}
+        <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+          <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#334155", marginBottom: "16px" }}>Características Adicionais</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
+            <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              <input type="checkbox" name="isIpvaPago" style={{ width: "18px", height: "18px" }} />
+              <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>📄 IPVA Pago</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              <input type="checkbox" name="isLeilao" style={{ width: "18px", height: "18px" }} />
+              <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>🔨 Leilão</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              <input type="checkbox" name="isAlienado" style={{ width: "18px", height: "18px" }} />
+              <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>🏦 Alienado</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
+              <input type="checkbox" name="isGarantia" style={{ width: "18px", height: "18px" }} />
+              <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>🛡️ Garantia</span>
+            </label>
           </div>
         </div>
 

@@ -71,6 +71,10 @@ export interface CreateVehicleInput {
   description: string;
   status: string;
   imageUrls: string[];
+  isLeilao?: boolean;
+  isIpvaPago?: boolean;
+  isAlienado?: boolean;
+  isGarantia?: boolean;
 }
  
 export async function createVehicle(input: CreateVehicleInput) {
@@ -99,7 +103,11 @@ export async function createVehicle(input: CreateVehicleInput) {
         options,
         description,
         status,
-        images: JSON.stringify(imageUrls)
+        images: JSON.stringify(imageUrls),
+        isLeilao: !!input.isLeilao,
+        isIpvaPago: !!input.isIpvaPago,
+        isAlienado: !!input.isAlienado,
+        isGarantia: !!input.isGarantia
       }
     });
  
