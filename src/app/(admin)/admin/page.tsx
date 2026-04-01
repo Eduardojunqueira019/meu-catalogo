@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { PlusCircle, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import VehicleActions from "./VehicleActions";
+import styles from "./admin.module.css";
+import { formatCurrency } from "@/utils/format";
 
 export const dynamic = "force-dynamic";
 
@@ -10,69 +12,76 @@ export default async function AdminDashboardPage() {
     orderBy: { createdAt: "desc" },
   });
 
+  const vehicleCount = vehicles.length;
+
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-        <div>
-          <h1 style={{ fontSize: "2rem", color: "var(--text-dark)", marginBottom: "8px" }}>Gestão de Veículos</h1>
-          <p style={{ color: "var(--text-light)" }}>Gerencie seu estoque de veículos cadastrados.</p>
-        </div>
-        
-        <Link href="/admin/veiculos/novo" className="btn-primary" style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <PlusCircle size={20} />
-          Cadastrar Veículo
-        </Link>
+    <div className={styles.adminContainer}>
+      {/* Header Summary */}
+      <div className={styles.summaryBar}>
+        {vehicleCount} {vehicleCount === 1 ? "VEÍCULO" : "VEÍCULOS"} EM ESTOQUE
       </div>
 
-      <div className="table-container" style={{ background: "white", borderRadius: "12px", boxShadow: "var(--box-shadow)", border: "1px solid var(--border-color)", overflow: "hidden" }}>
+      <div className={styles.vehicleList}>
         {vehicles.length === 0 ? (
-          <div style={{ padding: "40px", textAlign: "center", color: "var(--text-light)" }}>
-            <Search size={40} style={{ opacity: 0.3, margin: "0 auto 16px" }} />
-            <p>Nenhum veículo cadastrado ainda.</p>
+          <div style={{ padding: "80px 40px", textAlign: "center", color: "var(--text-light)", background: "white" }}>
+            <Search size={48} style={{ opacity: 0.1, margin: "0 auto 16px" }} />
+            <p style={{ fontSize: "1.1rem", fontWeight: "600" }}>Nenhum veículo cadastrado.</p>
+            <p style={{ marginTop: "8px" }}>Toque no botão "+" para começar.</p>
           </div>
         ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left", minWidth: "600px" }}>
-            <thead>
-              <tr style={{ background: "var(--bg-color)", borderBottom: "1px solid var(--border-color)" }}>
-                <th style={{ padding: "16px", fontWeight: "600", color: "var(--text-light)" }}>Veículo</th>
-                <th style={{ padding: "16px", fontWeight: "600", color: "var(--text-light)" }}>Ano</th>
-                <th style={{ padding: "16px", fontWeight: "600", color: "var(--text-light)" }}>Preço</th>
-                <th style={{ padding: "16px", fontWeight: "600", color: "var(--text-light)" }}>Status</th>
-                <th style={{ padding: "16px", fontWeight: "600", color: "var(--text-light)", textAlign: "right" }}>Ações Rápidas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {vehicles.map((v) => (
-                <tr key={v.id} style={{ borderBottom: "1px solid var(--border-color)" }}>
-                  <td style={{ padding: "16px", fontWeight: "600" }}>
-                    <Link href={`/catalogo/${v.id}`} target="_blank" style={{ color: "var(--primary)" }}>
-                      {v.name}
-                    </Link>
-                  </td>
-                  <td style={{ padding: "16px", color: "var(--text-dark)" }}>{v.year}</td>
-                  <td style={{ padding: "16px", color: "var(--text-dark)" }}>R$ {v.price}</td>
-                  <td style={{ padding: "16px" }}>
-                    <span style={{ 
-                      background: v.status === "disponivel" ? "#dcfce7" : "#fee2e2", 
-                      color: v.status === "disponivel" ? "#166534" : "#991b1b", 
-                      padding: "4px 12px", 
-                      borderRadius: "20px", 
-                      fontSize: "0.85rem", 
-                      fontWeight: "bold",
-                      whiteSpace: "nowrap"
-                    }}>
-                      {v.status === "disponivel" ? "Disponível" : "Vendido"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "16px" }}>
+          vehicles.map((v) => {
+            let imageUrl = "/placeholder-car.jpg";
+            try {
+              if (v.images) {
+                const images = JSON.parse(v.images);
+                if (images.length > 0) imageUrl = images[0];
+              }
+            } catch (e) {
+              console.error("Error parsing images for vehicle", v.id, e);
+            }
+
+            // In the screenshot, there is a plate. Since we don't have it, we use a 
+            // partial ID or KM as a placeholder to match the visual weight.
+            const platePlaceholder = v.km > 0 ? `${v.km.toLocaleString()} KM` : `ID-${v.id.substring(0, 4).toUpperCase()}`;
+
+            return (
+              <div key={v.id} className={styles.vehicleCard}>
+                {/* Image Section */}
+                <div className={styles.imageWrapper}>
+                  <img src={imageUrl} alt={v.name} className={styles.thumbnail} />
+                  <div className={styles.updatedTag}>Atualizado</div>
+                </div>
+
+                {/* Details Section */}
+                <div className={styles.details}>
+                  <div className={styles.titleLine}>
+                    <h3 className={styles.name}>{v.name} {v.year}</h3>
+                    <p className={styles.subtitle}>
+                      {v.gearbox} • {v.type.toUpperCase()} • {v.description.substring(0, 40)}{v.description.length > 40 ? "..." : ""}
+                    </p>
+                  </div>
+                  
+                  <div className={styles.infoLine}>
+                    <span className={styles.plate}>{platePlaceholder}</span>
+                    <span className={styles.price}>{formatCurrency(v.price)}</span>
+                  </div>
+
+                  {/* Quick Actions Integration */}
+                  <div className={styles.actionsRow}>
                     <VehicleActions id={v.id} name={v.name} year={v.year} price={v.price} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
+
+      {/* Floating Action Button */}
+      <Link href="/admin/veiculos/novo" className={styles.fab} title="Cadastrar Veículo">
+        <Plus size={32} />
+      </Link>
     </div>
   );
 }
+

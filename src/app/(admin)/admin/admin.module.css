@@ -1,0 +1,189 @@
+.adminContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 80px);
+  background-color: #f0f7ff;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.summaryBar {
+  background-color: white;
+  padding: 14px 20px;
+  text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px; /* Give it some breathing room */
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.vehicleList {
+  display: flex;
+  flex-direction: column;
+  background-color: transparent; /* Changed to show the blue background between cards */
+  flex: 1;
+  gap: 8px; /* Space between cards on mobile */
+  width: 100%;
+}
+
+.vehicleCard {
+  display: flex;
+  padding: 12px;
+  background-color: white; /* Card has its own background now */
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.vehicleCard:hover {
+  background-color: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.imageWrapper {
+  width: 100px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 480px) {
+  .imageWrapper {
+    width: 120px;
+  }
+}
+
+.thumbnail {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.updatedTag {
+  background-color: #22c55e;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-align: center;
+  padding: 4px 0;
+  margin-top: 4px;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0; /* Important for text overflow */
+}
+
+.titleLine {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1e293b;
+  text-transform: uppercase;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.infoLine {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 4px;
+}
+
+.plate {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1d4ed8; /* Blue from screenshot */
+}
+
+/* Actions Section */
+.actionsRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+/* Floating Action Button (FAB) */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background-color: #3b82f6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 100;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.fab:hover {
+  transform: scale(1.1);
+  background-color: #2563eb;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .vehicleList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 16px;
+    padding: 24px;
+    background-color: transparent;
+  }
+
+  .vehicleCard {
+    background-color: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+}

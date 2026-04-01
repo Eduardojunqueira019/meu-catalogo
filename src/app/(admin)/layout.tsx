@@ -93,8 +93,25 @@ export default function AdminLayout({
       </aside>
  
       {/* Main Content */}
-      <main className="admin-main" style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
-        {children}
+      <main className="admin-main" style={{ flex: 1, overflowY: "auto" }}>
+        <div style={{ padding: "var(--admin-padding, 20px)" }}>
+           {children}
+        </div>
+        <style jsx global>{`
+          :root {
+            --admin-padding: 16px;
+          }
+          @media (min-width: 768px) {
+            :root {
+              --admin-padding: 40px;
+            }
+          }
+           .admin-main {
+             width: 100%;
+             max-width: 100vw;
+             overflow-x: hidden;
+           }
+        `}</style>
       </main>
     </div>
   );

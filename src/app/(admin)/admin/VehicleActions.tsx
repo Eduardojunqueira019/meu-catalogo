@@ -29,18 +29,18 @@ export default function VehicleActions({ id, name, year, price }: { id: string, 
   }
 
   return (
-    <div style={{ display: "flex", gap: "8px", alignItems: "center", justifyContent: "flex-end" }}>
-      <button type="button" onClick={handleDelete} title="Excluir Veículo" style={{ background: "#fef2f2", color: "#ef4444", border: "1px solid #fecaca", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex", marginRight: "12px" }}>
-        <Trash2 size={16} />
+    <div style={{ display: "flex", gap: "8px", alignItems: "center", justifyContent: "flex-start", width: "100%" }}>
+      <button type="button" onClick={handleDelete} title="Excluir Veículo" style={{ background: "#fef2f2", color: "#ef4444", border: "1px solid #fecaca", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
+        <Trash2 size={14} />
       </button>
-      <a href={`/catalogo/${id}`} target="_blank" title="Ver no Catálogo" style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
-        <ExternalLink size={16} />
+      <a href={`/catalogo/${v.id || id}`} target="_blank" title="Ver no Catálogo" style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
+        <ExternalLink size={14} />
       </a>
       <button type="button" onClick={handleCopy} title="Copiar Link" style={{ background: "#eff6ff", color: "#3b82f6", border: "1px solid #bfdbfe", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
-        <LinkIcon size={16} />
+        <LinkIcon size={14} />
       </button>
       <button type="button" onClick={handleWhatsApp} title="Enviar WhatsApp" style={{ background: "#f0fdf4", color: "#22c55e", border: "1px solid #bbf7d0", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
-        <Share2 size={16} />
+        <Share2 size={14} />
       </button>
     </div>
   )
