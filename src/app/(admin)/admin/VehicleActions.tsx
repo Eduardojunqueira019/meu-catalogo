@@ -33,7 +33,7 @@ export default function VehicleActions({ id, name, year, price }: { id: string, 
       <button type="button" onClick={handleDelete} title="Excluir Veículo" style={{ background: "#fef2f2", color: "#ef4444", border: "1px solid #fecaca", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
         <Trash2 size={14} />
       </button>
-      <a href={`/catalogo/${v.id || id}`} target="_blank" title="Ver no Catálogo" style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
+      <a href={`/catalogo/${id}`} target="_blank" title="Ver no Catálogo" style={{ background: "#f1f5f9", color: "#475569", border: "1px solid #cbd5e1", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>
         <ExternalLink size={14} />
       </a>
       <button type="button" onClick={handleCopy} title="Copiar Link" style={{ background: "#eff6ff", color: "#3b82f6", border: "1px solid #bfdbfe", padding: "6px", borderRadius: "6px", cursor: "pointer", display: "flex" }}>

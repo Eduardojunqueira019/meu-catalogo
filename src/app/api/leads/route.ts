@@ -6,16 +6,16 @@ import { Resend } from "resend";
 export const dynamic = "force-dynamic";
 
 // Initialize Pusher (Server-side)
-const pusher = new Pusher({
+const pusher = process.env.PUSHER_APP_ID ? new Pusher({
   appId: process.env.PUSHER_APP_ID || "",
   key: process.env.PUSHER_KEY || "",
   secret: process.env.PUSHER_SECRET || "",
   cluster: process.env.PUSHER_CLUSTER || "sa1",
   useTLS: true,
-});
+}) : null;
 
 // Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(req: Request) {
   try {
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 
     // 1. TRIGGER REAL-TIME NOTIFICATION
     try {
-      if (process.env.PUSHER_KEY) {
+      if (pusher) {
         await pusher.trigger("admin-notifications", "new-lead", {
           id: lead.id,
           name: lead.name,
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
 
     // 2. SEND AUTOMATIC EMAIL
     try {
-      if (process.env.RESEND_API_KEY) {
+      if (resend) {
         await resend.emails.send({
           from: 'Catalogo <onboarding@resend.dev>',
           to: 'wdc25@outlook.com', // Using user contact as fallback/admin
