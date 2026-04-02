@@ -15,7 +15,8 @@ import {
   Plus,
   RefreshCcw,
   LucideIcon,
-  Info
+  Info,
+  Search
 } from "lucide-react";
 
 function PricingContent() {
@@ -50,6 +51,8 @@ function PricingContent() {
   
   const [rawPrices, setRawPrices] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [analysis, setAnalysis] = useState<PricingAnalysis | null>(null);
+  const [error, setError] = useState("");
 
   const handleAISearch = async () => {
     if (!input.veiculo || !input.ano) {

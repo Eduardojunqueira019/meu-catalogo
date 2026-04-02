@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { CarFront, LogOut, LayoutDashboard, Users, User, Menu, X, Share2, MessageSquare } from "lucide-react";
+import { CarFront, LogOut, LayoutDashboard, Users, User, Menu, X, Share2, MessageSquare, TrendingUp } from "lucide-react";
 import { usePathname } from "next/navigation";
 import LeadNotifier from "@/components/admin/LeadNotifier";
  
