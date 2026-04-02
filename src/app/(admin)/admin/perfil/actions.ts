@@ -74,6 +74,7 @@ export async function saveProfile(formData: FormData) {
     address: formData.get("address") as string,
     city: formData.get("city") as string,
     bio: formData.get("bio") as string,
+    whatsappMessage: (formData.get("whatsappMessage") as string) || "",
     photoUrl,
     storeLogoUrl,
   };

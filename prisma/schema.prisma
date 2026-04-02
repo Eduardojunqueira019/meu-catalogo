@@ -89,6 +89,7 @@ model Profile {
   address     String   @default("")
   city        String   @default("")
   bio         String   @default("Te ajudo a encontrar e financiar o carro ideal com segurança")
+  whatsappMessage String? @default("Olá [nome], vi seu interesse no veículo [veiculo] em nosso site. Como posso te ajudar?")
   photoUrl    String   @default("/placeholder-user.jpg")
   updatedAt   DateTime @updatedAt
 }

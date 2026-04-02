@@ -176,12 +176,24 @@ export default function ProfileForm({ profile }: { profile: any }) {
           <label style={labelStyle}>Cidade / Estado</label>
           <input type="text" name="city" defaultValue={profile?.city || ""} placeholder="Ex: São Paulo - SP" required style={inputStyle} />
           
-          <label style={labelStyle} >Descrição Professional (Bio)</label>
+          <label style={labelStyle} >Descrição Profissional (Bio)</label>
           <textarea 
             name="bio" 
             defaultValue={profile?.bio || ""} 
             placeholder="Conte um pouco sobre sua experiência e como você ajuda seus clientes..." 
-            rows={6} 
+            rows={4} 
+            style={{ ...inputStyle, resize: "none", marginBottom: "16px" }}
+          ></textarea>
+
+          <label style={labelStyle}>Mensagem Padrão do WhatsApp</label>
+          <p style={{ fontSize: "0.75rem", color: "var(--text-light)", marginTop: "-4px", marginBottom: "8px" }}>
+            Use <strong>[nome]</strong> para o nome do cliente e <strong>[veiculo]</strong> para o carro de interesse.
+          </p>
+          <textarea 
+            name="whatsappMessage" 
+            defaultValue={profile?.whatsappMessage || "Olá [nome], vi seu interesse no veículo [veiculo] em nosso site. Como posso te ajudar?"} 
+            placeholder="Ex: Olá [nome], vi que você se interessou pelo [veiculo]. Vamos conversar?" 
+            rows={4} 
             style={{ ...inputStyle, resize: "none" }}
           ></textarea>
         </section>
