@@ -6,20 +6,18 @@ import { useSearchParams } from "next/navigation";
 import { 
   TrendingUp, 
   TrendingDown, 
-  AlertTriangle, 
+  AlertCircle, 
   ChevronRight, 
-  BarChart3, 
+  Search, 
   DollarSign, 
   Zap, 
-  ShieldCheck, 
+  CheckCircle, 
   Plus,
-  RefreshCcw,
-  LucideIcon,
+  RefreshCw,
   Info,
-  Search,
   ArrowRight,
-  Globe,
-  LayoutDashboard
+  LayoutDashboard,
+  CarFront
 } from "lucide-react";
 
 interface PlatformSummary {
@@ -33,10 +31,11 @@ function PricingContent() {
   
   const [input, setInput] = useState<Partial<PricingInput>>({
     veiculo: "",
-    ano: new Date().getFullYear(),
+    ano: 0, // Hydration safe: start at 0
     versao: "",
     km: 0,
     fipe: 0,
+    valor_teste: 0,
     precos_mercado: []
   });
 
@@ -50,20 +49,27 @@ function PricingContent() {
   };
 
   useEffect(() => {
+    // Set current year on client to avoid hydration mismatch
+    if (input.ano === 0) {
+      const currentYear = new Date().getFullYear();
+      setInput(prev => ({ ...prev, ano: prev.ano || currentYear }));
+    }
+
     const name = searchParams.get("name");
     const year = searchParams.get("year");
     const km = searchParams.get("km");
     const fipe = searchParams.get("fipe");
+    const testPrice = searchParams.get("venda");
 
-    if (name || year || km || fipe) {
-      setInput({
-        veiculo: name || "",
-        ano: Number(year) || new Date().getFullYear(),
-        km: Number(km) || 0,
-        fipe: Number(fipe) || 0,
-        versao: "",
-        precos_mercado: []
-      });
+    if (name || year || km || fipe || testPrice) {
+      setInput(prev => ({
+        ...prev,
+        veiculo: name || prev.veiculo,
+        ano: Number(year) || prev.ano,
+        km: Number(km) || prev.km,
+        fipe: Number(fipe) || prev.fipe,
+        valor_teste: Number(testPrice) || prev.valor_teste
+      }));
     }
   }, [searchParams]);
   
@@ -106,6 +112,7 @@ function PricingContent() {
                 versao: "",
                 km: Number(input.km) || 0,
                 fipe: Number(input.fipe),
+                valor_teste: Number(input.valor_teste),
                 precos_mercado: allPrices
           });
           setAnalysis(result);
@@ -141,7 +148,7 @@ function PricingContent() {
         </div>
         <div style={{ background: "#eff6ff", padding: "12px 20px", borderRadius: "16px", border: "1px solid #dbeafe" }}>
             <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#1e40af", display: "flex", alignItems: "center", gap: "8px" }}>
-                <Globe size={18} /> MODO: PESQUISA MULTICANAL
+                <Search size={18} /> MODO: PESQUISA MULTICANAL
             </span>
         </div>
       </header>
@@ -160,15 +167,19 @@ function PricingContent() {
             <label style={labelMiniStyle}>Tabela FIPE (R$)</label>
             <input type="number" placeholder="Valor ref." value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} style={{ ...inputPremiumStyle, borderColor: "#3b82f6", color: "#2563eb", fontWeight: "800" }} />
         </div>
+        <div style={{ flex: 1.2 }}>
+            <label style={{ ...labelMiniStyle, color: "#1e293b" }}>Meu Valor de Venda (R$)</label>
+            <input type="number" placeholder="Ex: 45000" value={input.valor_teste || ""} onChange={e => setInput({...input, valor_teste: Number(e.target.value)})} style={{ ...inputPremiumStyle, background: "#f1f5f9", borderColor: "#cbd5e1" }} />
+        </div>
         <button onClick={handleAISearch} disabled={isSearching} style={btnMainStyle}>
-            {isSearching ? <RefreshCcw size={20} className="spin" /> : <Zap size={20} />} 
+            {isSearching ? <RefreshCw size={20} className="spin" /> : <Zap size={20} />} 
             {isSearching ? "Buscando Preços..." : "Avaliar Agora"}
         </button>
       </section>
 
       {error && (
         <div style={{ marginBottom: "32px", padding: "16px 24px", background: "#fef2f2", borderLeft: "4px solid #ef4444", borderRadius: "8px", color: "#991b1b", fontWeight: "600", display: "flex", alignItems: "center", gap: "12px" }}>
-            <AlertTriangle size={20} /> {error}
+            <AlertCircle size={20} /> {error}
         </div>
       )}
 
@@ -176,30 +187,62 @@ function PricingContent() {
       {platformData ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
             
-            {/* Cards de Destaque Superior */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: "24px" }}>
-                {/* Card FIPE */}
-                <div style={{ background: "white", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", position: "relative", overflow: "hidden" }}>
-                    <div style={{ position: "absolute", right: "-10px", bottom: "-10px", opacity: 0.05 }}><DollarSign size={120} /></div>
-                    <p style={labelMiniStyle}>Referência Oficial</p>
-                    <h2 style={{ fontSize: "2.8rem", fontWeight: "900", color: "#1e293b", margin: "8px 0" }}>{formatCurrency(input.fipe || 0)}</h2>
-                    <span style={{ fontSize: "0.8rem", fontWeight: "700", color: "#64748b" }}>FONTE: TABELA FIPE (BRASIL)</span>
+            {/* DIAGNÓSTICO ESTILO WEBMOTORS (Card Negro Premium) */}
+            <div style={{ background: "#111827", padding: "40px", borderRadius: "32px", color: "white", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
+                <p style={{ ...labelMiniStyle, color: "#94a3b8", marginBottom: "24px" }}>Compare os preços (Diagnóstico Real de Mercado)</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "40px", alignItems: "center" }}>
+                    {/* Pilar 1: Seu Preço */}
+                    <div>
+                        <span style={{ fontSize: "0.85rem", color: "#94a3b8", fontWeight: "600" }}>Valor anunciado</span>
+                        <h3 style={{ fontSize: "2.4rem", fontWeight: "900", margin: "12px 0", color: "#fff" }}>{formatCurrency(input.valor_teste || 0)}</h3>
+                        {analysis?.delta_teste_mercado !== undefined && (
+                            <span style={{ fontSize: "0.9rem", color: analysis.delta_teste_mercado > 0 ? "#f87171" : "#4ade80", fontWeight: "700" }}>
+                                {analysis.delta_teste_mercado > 0 ? "ACIMA DA MÉDIA" : "EXCELENTE PREÇO"} 
+                                ({Math.abs(analysis.delta_teste_mercado)}%)
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Pilar 2: Média WebMotors */}
+                    <div style={{ borderLeft: "1px solid #374151", paddingLeft: "40px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
+                            <img src="https://www.webmotors.com.br/assets/img/logo-webmotors.svg" alt="Webmotors" style={{ height: "18px", filter: "brightness(0) invert(1)" }} />
+                        </div>
+                        <h3 style={{ fontSize: "2.4rem", fontWeight: "900", margin: "12px 0", color: "#fff" }}>{formatCurrency(analysis?.media_mercado || 0)}</h3>
+                        <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0 }}>Valor médio real consultado hoje</p>
+                    </div>
+
+                    {/* Pilar 3: FIPE */}
+                    <div style={{ borderLeft: "1px solid #374151", paddingLeft: "40px" }}>
+                        <span style={{ fontSize: "0.85rem", color: "#4ade80", fontWeight: "900", textTransform: "uppercase" }}>fipe</span>
+                        <h3 style={{ fontSize: "2.4rem", fontWeight: "900", margin: "12px 0", color: "#fff" }}>{formatCurrency(input.fipe || 0)}</h3>
+                        <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0 }}>Referência oficial Brasil</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Cards de Destaque Detalhado */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+                {/* Score de Liquidez */}
+                <div style={{ background: "white", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0" }}>
+                    <p style={labelMiniStyle}>Liquidez Estimada</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "12px" }}>
+                        <div style={{ flex: 1, height: "12px", background: "#f1f5f9", borderRadius: "6px", overflow: "hidden" }}>
+                            <div style={{ width: analysis?.liquidez === "ALTA" ? "100%" : analysis?.liquidez === "MEDIA" ? "60%" : "25%", height: "100%", background: "#3b82f6" }} />
+                        </div>
+                        <span style={{ fontWeight: "800", color: "#1e293b" }}>{analysis?.liquidez}</span>
+                    </div>
                 </div>
 
                 {/* Card Especialista */}
                 {analysis && (
-                    <div style={{ background: "#0f172a", padding: "32px", borderRadius: "32px", color: "white", position: "relative" }}>
+                    <div style={{ background: "#f8fafc", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", position: "relative" }}>
                         <div style={{ position: "absolute", top: "32px", right: "32px" }}>
-                           {analysis.classificacao === "FORTE" ? <TrendingUp size={40} color="#10b981" /> : <TrendingDown size={40} color="#3b82f6" />}
+                           {analysis.classificacao === "FORTE" ? <TrendingUp size={32} color="#10b981" /> : <TrendingDown size={32} color="#3b82f6" />}
                         </div>
-                        <p style={{ ...labelMiniStyle, color: "#94a3b8" }}>Diagnóstico do Especialista</p>
-                        <h2 style={{ fontSize: "2.8rem", fontWeight: "900", marginBottom: "8px" }}>Mercado {analysis.classificacao}</h2>
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                           <div style={{ background: "#1e293b", padding: "8px 16px", borderRadius: "12px", border: "1px solid #334155" }}>
-                               <span style={{ fontSize: "0.8rem", color: "#94a3b8", fontWeight: "700" }}>PAGAR ATÉ:</span>
-                               <p style={{ fontSize: "1.2rem", fontWeight: "900", margin: 0 }}>{formatCurrency(analysis.preco_compra_sugerido)}</p>
-                           </div>
-                        </div>
+                        <p style={labelMiniStyle}>Oportunidade de Compra</p>
+                        <h2 style={{ fontSize: "1.8rem", fontWeight: "900", color: "#1e293b", margin: "8px 0" }}>Margem de {analysis.margem_estimada}%</h2>
+                        <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#64748b" }}>SUGESTÃO DE PAGAMENTO: {formatCurrency(analysis.preco_compra_sugerido)}</span>
                     </div>
                 )}
             </div>
@@ -207,7 +250,7 @@ function PricingContent() {
             {/* Comparativo WebMotors / OLX / iCarros / Facebook */}
             <div>
                <h3 style={{ fontSize: "1.2rem", fontWeight: "800", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
-                 <BarChart3 size={20} color="#3b82f6" /> Comparativo Detalhado por Plataforma
+                 <TrendingUp size={20} color="#3b82f6" /> Comparativo Detalhado por Plataforma
                </h3>
                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
                  {platforms.map(p => {
@@ -249,7 +292,7 @@ function PricingContent() {
                     <div style={{ display: "flex", gap: "48px" }}>
                         <div style={{ flex: 2 }}>
                            <h4 style={{ fontSize: "1.2rem", fontWeight: "800", marginBottom: "16px", display: "flex", alignItems: "center", gap: "12px" }}>
-                              <ShieldCheck color="#2563eb" /> Resumo Estratégico
+                              <CheckCircle color="#2563eb" /> Resumo Estratégico
                            </h4>
                            <p style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#475569", margin: 0 }}>
                               {analysis.analise_resumida}
@@ -261,7 +304,7 @@ function PricingContent() {
                               {analysis.riscos.length > 0 ? (
                                   analysis.riscos.map((r, i) => (
                                       <div key={i} style={{ display: "flex", gap: "10px" }}>
-                                          <AlertTriangle size={18} color="#f59e0b" style={{ flexShrink: 0 }} />
+                                          <AlertCircle size={18} color="#f59e0b" style={{ flexShrink: 0 }} />
                                           <p style={{ fontSize: "0.85rem", color: "#64748b", margin: 0 }}>{r}</p>
                                       </div>
                                   ))
@@ -275,7 +318,7 @@ function PricingContent() {
             )}
 
             <button onClick={() => setPlatformData(null)} style={{ alignSelf: "center", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontWeight: "700", display: "flex", alignItems: "center", gap: "8px", fontSize: "0.9rem" }}>
-                <RefreshCcw size={16} /> Fazer Nova Pesquisa
+                <RefreshCw size={16} /> Fazer Nova Pesquisa
             </button>
 
         </div>

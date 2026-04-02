@@ -10,6 +10,7 @@ export interface PricingInput {
   km: number;
   fipe: number;
   precos_mercado: number[];
+  valor_teste?: number;
 }
 
 export interface PricingAnalysis {
@@ -25,6 +26,9 @@ export interface PricingAnalysis {
   liquidez: "ALTA" | "MEDIA" | "BAIXA";
   analise_resumida: string;
   riscos: string[];
+  valor_teste?: number;
+  delta_teste_fipe?: number;
+  delta_teste_mercado?: number;
 }
 
 export function analyzePricing(input: PricingInput): PricingAnalysis {
@@ -119,6 +123,9 @@ export function analyzePricing(input: PricingInput): PricingAnalysis {
     margem_estimada: Number(margem.toFixed(2)),
     liquidez,
     analise_resumida,
-    riscos
+    riscos,
+    valor_teste: input.valor_teste,
+    delta_teste_fipe: input.valor_teste ? Number(((input.valor_teste - input.fipe) / input.fipe * 100).toFixed(1)) : 0,
+    delta_teste_mercado: input.valor_teste ? Number(((input.valor_teste - finalMean) / finalMean * 100).toFixed(1)) : 0
   };
 }
