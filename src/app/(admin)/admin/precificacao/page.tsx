@@ -52,6 +52,7 @@ function PricingContent() {
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
+  const [fipeReference, setFipeReference] = useState("");
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(val);
@@ -127,8 +128,20 @@ function PricingContent() {
        if (yearValue) {
            setInput(prev => ({ ...prev, ano: Number(yearValue) }));
        }
+
+       // Fetch Final FIPE Value & Reference Month
+       fetch(`https://parallelum.com.br/fipe/api/v1/${apiType}/marcas/${selectedBrand}/modelos/${selectedModel}/anos/${selectedYear}`)
+         .then(res => res.json())
+         .then(data => {
+            if (data.Valor) {
+                const numericValue = Number(data.Valor.replace(/[R$\s.]/g, '').replace(',', '.'));
+                setInput(prev => ({ ...prev, fipe: numericValue }));
+                setFipeReference(data.MesReferencia || "");
+            }
+         })
+         .catch(console.error);
     }
-  }, [selectedYear]);
+  }, [selectedYear, selectedBrand, selectedModel, apiType]);
   
   const handleAISearch = async () => {
     if (!input.veiculo || !input.ano) {
@@ -255,6 +268,7 @@ function PricingContent() {
         <div style={{ flex: 1.2 }}>
             <label style={labelMiniStyle}>Tabela FIPE (R$)</label>
             <input type="number" placeholder="Valor ref." value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} style={{ ...inputPremiumStyle, borderColor: "#3b82f6", color: "#2563eb", fontWeight: "800" }} />
+            {fipeReference && <span style={{ fontSize: "0.65rem", color: "#94a3b8", fontWeight: "700", marginTop: "4px", display: "block" }}>Ref: {fipeReference}</span>}
         </div>
         <div style={{ flex: 1.2 }}>
             <label style={{ ...labelMiniStyle, color: "#1e293b" }}>Meu Valor de Venda (R$)</label>
