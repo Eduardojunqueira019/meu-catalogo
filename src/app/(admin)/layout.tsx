@@ -19,8 +19,8 @@ export default function AdminLayout({
   const navItems = [
     { name: "Veículos", href: "/admin", icon: CarFront },
     { name: "Leads", href: "/admin/leads", icon: Users },
+    { name: "Precificação", href: "/admin/precificacao", icon: MessageSquare },
     { name: "Marketing", href: "#", icon: Share2 },
-    { name: "Financeiro", href: "#", icon: MessageSquare },
     { name: "Perfil", href: "/admin/perfil", icon: User },
   ];
  

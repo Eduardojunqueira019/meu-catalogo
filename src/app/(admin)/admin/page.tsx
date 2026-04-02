@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { Plus, Search, Filter, ArrowUpDown, Download, Eye, MessageSquare, AlertCircle, Clock, Trash2, ExternalLink, Share2 } from "lucide-react";
+import { Plus, Search, Filter, ArrowUpDown, Download, Eye, MessageSquare, AlertCircle, Clock, Trash2, ExternalLink, Share2, TrendingUp } from "lucide-react";
 import VehicleActions from "./VehicleActions";
 import styles from "./admin.module.css";
 import { formatCurrency } from "@/utils/format";
@@ -89,13 +89,22 @@ export default async function AdminDashboardPage() {
                       </div>
 
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "auto" }}>
-                         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
-                            <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.editBtn}>
-                                <Plus size={14} /> Editar Veículo
-                            </Link>
-                         </div>
-                        <span style={{ fontSize: "1rem", fontWeight: "800", color: "#1e293b" }}>{formatCurrency(v.price)}</span>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                            <span style={{ fontSize: "0.80rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
+                            <div style={{ display: "flex", gap: "8px" }}>
+                              <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.editBtn}>
+                                  <Plus size={14} /> Editar
+                              </Link>
+                              <Link 
+                                href={`/admin/precificacao?name=${encodeURIComponent(v.name)}&fipe=${v.price}&year=${v.year}&km=${v.km}`} 
+                                className={styles.editBtn} 
+                                style={{ background: "#f8fafc", color: "#3b82f6", border: "1px solid #3b82f6" }}
+                              >
+                                  <TrendingUp size={14} /> Analista
+                              </Link>
+                            </div>
+                        </div>
+                        <span style={{ fontSize: "1.1rem", fontWeight: "900", color: "#0f172a" }}>{formatCurrency(v.price)}</span>
                       </div>
                     </div>
                   </div>
