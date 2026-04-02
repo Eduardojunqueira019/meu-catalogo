@@ -89,21 +89,12 @@ export default async function AdminDashboardPage() {
                       </div>
 
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "auto" }}>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                             <span style={{ fontSize: "0.80rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
-                            <div style={{ display: "flex", gap: "8px" }}>
-                              <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.editBtn}>
-                                  <Plus size={14} /> Editar
-                              </Link>
-                              <Link 
-                                href={`/admin/precificacao?name=${encodeURIComponent(v.name)}&fipe=${v.price}&year=${v.year}&km=${v.km}`} 
-                                className={styles.editBtn} 
-                                style={{ background: "#f8fafc", color: "#3b82f6", border: "1px solid #3b82f6" }}
-                              >
-                                  <TrendingUp size={14} /> Analista
-                              </Link>
-                            </div>
-                        </div>
+                            <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.editBtn}>
+                                <Plus size={14} /> Editar Veículo
+                            </Link>
+                         </div>
                         <span style={{ fontSize: "1.1rem", fontWeight: "900", color: "#0f172a" }}>{formatCurrency(v.price)}</span>
                       </div>
                     </div>
