@@ -44,6 +44,15 @@ function PricingContent() {
   const [analysis, setAnalysis] = useState<PricingAnalysis | null>(null);
   const [error, setError] = useState("");
 
+  // FIPE Facilitador States
+  const [apiType, setApiType] = useState<"carros" | "motos">("carros");
+  const [brands, setBrands] = useState<{codigo: string, nome: string}[]>([]);
+  const [models, setModels] = useState<{codigo: string, nome: string}[]>([]);
+  const [years, setYears] = useState<{codigo: string, nome: string}[]>([]);
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(val);
   };
@@ -72,6 +81,54 @@ function PricingContent() {
       }));
     }
   }, [searchParams]);
+
+  // FIPE Facilitador Effects
+  useEffect(() => {
+    setSelectedBrand("");
+    setSelectedModel("");
+    setBrands([]);
+    setModels([]);
+    fetch(`https://parallelum.com.br/fipe/api/v1/${apiType}/marcas`)
+      .then(res => res.json())
+      .then(data => setBrands(data))
+      .catch(console.error);
+  }, [apiType]);
+
+  useEffect(() => {
+    if (!selectedBrand) { setModels([]); setSelectedModel(""); return; }
+    fetch(`https://parallelum.com.br/fipe/api/v1/${apiType}/marcas/${selectedBrand}/modelos`)
+      .then(res => res.json())
+      .then(data => setModels(data.modelos || []))
+      .catch(console.error);
+  }, [selectedBrand, apiType]);
+
+  useEffect(() => {
+    if (selectedModel && selectedBrand) {
+       const b = brands.find(x => String(x.codigo) === String(selectedBrand))?.nome || "";
+       const m = models.find(x => String(x.codigo) === String(selectedModel))?.nome || "";
+       if (b && m) {
+           let cleanBrand = b.replace("VW - ", ""); // Cleanup VW name
+           setInput(prev => ({ ...prev, veiculo: `${cleanBrand} ${m}`.split(" ").slice(0, 5).join(" ") }));
+       }
+    }
+  }, [selectedModel, selectedBrand, brands, models]);
+
+  useEffect(() => {
+    if (!selectedModel) { setYears([]); setSelectedYear(""); return; }
+    fetch(`https://parallelum.com.br/fipe/api/v1/${apiType}/marcas/${selectedBrand}/modelos/${selectedModel}/anos`)
+      .then(res => res.json())
+      .then(data => setYears(data))
+      .catch(console.error);
+  }, [selectedModel, selectedBrand, apiType]);
+
+  useEffect(() => {
+    if (selectedYear) {
+       const yearValue = selectedYear.split("-")[0];
+       if (yearValue) {
+           setInput(prev => ({ ...prev, ano: Number(yearValue) }));
+       }
+    }
+  }, [selectedYear]);
   
   const handleAISearch = async () => {
     if (!input.veiculo || !input.ano) {
@@ -153,7 +210,39 @@ function PricingContent() {
         </div>
       </header>
 
-      {/* Seção de Entrada (Pesquisa) */}
+      {/* FIPE Facilitador (Marca / Modelo) */}
+      <section style={{ ...searchBarContainerStyle, marginBottom: "20px", background: "#f8fafc", padding: "16px 24px" }}>
+        <div style={{ flex: 1 }}>
+            <label style={labelMiniStyle}>Tipo</label>
+            <select value={apiType} onChange={e => setApiType(e.target.value as "carros" | "motos")} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white" }}>
+              <option value="carros">Carro</option>
+              <option value="motos">Moto</option>
+            </select>
+        </div>
+        <div style={{ flex: 1.5 }}>
+            <label style={labelMiniStyle}>1. Marca</label>
+            <select value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white" }}>
+              <option value="">Selecione a marca</option>
+              {brands.map(b => <option key={b.codigo} value={b.codigo}>{b.nome}</option>)}
+            </select>
+        </div>
+        <div style={{ flex: 2 }}>
+            <label style={labelMiniStyle}>2. Modelo</label>
+            <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)} disabled={!models.length} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white", opacity: models.length ? 1 : 0.6 }}>
+              <option value="">Selecione o modelo</option>
+              {models.map(m => <option key={m.codigo} value={m.codigo}>{m.nome}</option>)}
+            </select>
+        </div>
+        <div style={{ flex: 1.5 }}>
+            <label style={labelMiniStyle}>3. Ano FIPE</label>
+            <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} disabled={!years.length} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white", opacity: years.length ? 1 : 0.6 }}>
+              <option value="">Selecione o ano</option>
+              {years.map(y => <option key={y.codigo} value={y.codigo}>{y.nome}</option>)}
+            </select>
+        </div>
+      </section>
+
+      {/* Seção de Entrada Principal (Pesquisa) */}
       <section style={searchBarContainerStyle}>
         <div style={{ flex: 2 }}>
             <label style={labelMiniStyle}>O que você está negociando?</label>
