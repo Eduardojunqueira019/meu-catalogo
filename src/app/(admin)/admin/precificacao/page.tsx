@@ -205,50 +205,50 @@ function PricingContent() {
   ];
 
   return (
-    <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px", color: "#0f172a" }}>
+    <div className="main-container">
       {/* Header Premium com Gradiente */}
-      <header style={{ marginBottom: "48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <header className="page-header">
         <div>
-          <h1 style={{ fontSize: "2.5rem", fontWeight: "900", color: "#0f172a", marginBottom: "8px", letterSpacing: "-1px" }}>
+          <h1 className="title-main">
             Negociação <span style={{ color: "#3b82f6" }}>Inteligente</span>
           </h1>
-          <p style={{ color: "#64748b", fontSize: "1.1rem", fontWeight: "500" }}>
+          <p className="subtitle">
             Compare preços reais em múltiplos canais antes de fechar o negócio.
           </p>
         </div>
-        <div style={{ background: "#eff6ff", padding: "12px 20px", borderRadius: "16px", border: "1px solid #dbeafe" }}>
-            <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#1e40af", display: "flex", alignItems: "center", gap: "8px" }}>
+        <div className="badge-mode">
+            <span className="badge-text">
                 <Search size={18} /> MODO: PESQUISA MULTICANAL
             </span>
         </div>
       </header>
 
       {/* FIPE Facilitador (Marca / Modelo) */}
-      <section style={{ ...searchBarContainerStyle, marginBottom: "20px", background: "#f8fafc", padding: "16px 24px" }}>
-        <div style={{ flex: 1 }}>
+      <section className="search-section fipe-facilitator">
+        <div className="input-group">
             <label style={labelMiniStyle}>Tipo</label>
-            <select value={apiType} onChange={e => setApiType(e.target.value as "carros" | "motos")} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white" }}>
+            <select value={apiType} onChange={e => setApiType(e.target.value as "carros" | "motos")} className="premium-select">
               <option value="carros">Carro</option>
               <option value="motos">Moto</option>
             </select>
         </div>
-        <div style={{ flex: 1.5 }}>
+        <div className="input-group-lg">
             <label style={labelMiniStyle}>1. Marca</label>
-            <select value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white" }}>
+            <select value={selectedBrand} onChange={e => setSelectedBrand(e.target.value)} className="premium-select">
               <option value="">Selecione a marca</option>
               {brands.map(b => <option key={b.codigo} value={b.codigo}>{b.nome}</option>)}
             </select>
         </div>
-        <div style={{ flex: 2 }}>
+        <div className="input-group-xl">
             <label style={labelMiniStyle}>2. Modelo</label>
-            <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)} disabled={!models.length} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white", opacity: models.length ? 1 : 0.6 }}>
+            <select value={selectedModel} onChange={e => setSelectedModel(e.target.value)} disabled={!models.length} className="premium-select" style={{ opacity: models.length ? 1 : 0.6 }}>
               <option value="">Selecione o modelo</option>
               {models.map(m => <option key={m.codigo} value={m.codigo}>{m.nome}</option>)}
             </select>
         </div>
-        <div style={{ flex: 1.5 }}>
+        <div className="input-group-lg">
             <label style={labelMiniStyle}>3. Ano FIPE</label>
-            <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} disabled={!years.length} style={{ ...inputPremiumStyle, padding: "10px 14px", background: "white", opacity: years.length ? 1 : 0.6 }}>
+            <select value={selectedYear} onChange={e => setSelectedYear(e.target.value)} disabled={!years.length} className="premium-select" style={{ opacity: years.length ? 1 : 0.6 }}>
               <option value="">Selecione o ano</option>
               {years.map(y => <option key={y.codigo} value={y.codigo}>{y.nome}</option>)}
             </select>
@@ -256,27 +256,27 @@ function PricingContent() {
       </section>
 
       {/* Seção de Entrada Principal (Pesquisa) */}
-      <section style={searchBarContainerStyle}>
-        <div style={{ flex: 2 }}>
+      <section className="search-section main-search">
+        <div className="input-group-xl">
             <label style={labelMiniStyle}>O que você está negociando?</label>
-            <input type="text" placeholder="Ex: Honda Civic G10, Corolla 2020..." value={input.veiculo} onChange={e => setInput({...input, veiculo: e.target.value})} style={inputPremiumStyle} />
+            <input type="text" placeholder="Ex: Honda Civic G10, Corolla 2020..." value={input.veiculo} onChange={e => setInput({...input, veiculo: e.target.value})} className="premium-input" />
         </div>
-        <div style={{ flex: 0.8 }}>
+        <div className="input-group-sm">
             <label style={labelMiniStyle}>Ano</label>
-            <input type="number" value={input.ano} onChange={e => setInput({...input, ano: Number(e.target.value)})} style={inputPremiumStyle} />
+            <input type="number" value={input.ano} onChange={e => setInput({...input, ano: Number(e.target.value)})} className="premium-input" />
         </div>
-        <div style={{ flex: 1.2 }}>
+        <div className="input-group">
             <label style={labelMiniStyle}>Tabela FIPE (R$)</label>
-            <input type="number" placeholder="Valor ref." value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} style={{ ...inputPremiumStyle, borderColor: "#3b82f6", color: "#2563eb", fontWeight: "800" }} />
-            {fipeReference && <span style={{ fontSize: "0.65rem", color: "#94a3b8", fontWeight: "700", marginTop: "4px", display: "block" }}>Ref: {fipeReference}</span>}
+            <input type="number" placeholder="Valor ref." value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} className="premium-input highlight" />
+            {fipeReference && <span className="ref-text">Ref: {fipeReference}</span>}
         </div>
-        <div style={{ flex: 1.2 }}>
+        <div className="input-group">
             <label style={{ ...labelMiniStyle, color: "#1e293b" }}>Meu Valor de Venda (R$)</label>
-            <input type="number" placeholder="Ex: 45000" value={input.valor_teste || ""} onChange={e => setInput({...input, valor_teste: Number(e.target.value)})} style={{ ...inputPremiumStyle, background: "#f1f5f9", borderColor: "#cbd5e1" }} />
+            <input type="number" placeholder="Ex: 45000" value={input.valor_teste || ""} onChange={e => setInput({...input, valor_teste: Number(e.target.value)})} className="premium-input gray" />
         </div>
-        <button onClick={handleAISearch} disabled={isSearching} style={btnMainStyle}>
+        <button onClick={handleAISearch} disabled={isSearching} className="btn-search">
             {isSearching ? <RefreshCw size={20} className="spin" /> : <Zap size={20} />} 
-            {isSearching ? "Buscando Preços..." : "Avaliar Agora"}
+            {isSearching ? "Buscando..." : "Avaliar"}
         </button>
       </section>
 
@@ -291,15 +291,15 @@ function PricingContent() {
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
             
             {/* DIAGNÓSTICO ESTILO WEBMOTORS (Card Negro Premium) */}
-            <div style={{ background: "#111827", padding: "40px", borderRadius: "32px", color: "white", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)" }}>
-                <p style={{ ...labelMiniStyle, color: "#94a3b8", marginBottom: "24px" }}>Compare os preços (Diagnóstico Real de Mercado)</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "40px", alignItems: "center" }}>
+            <div className="diagnostic-card">
+                <p className="card-label-light">Compare os preços (Diagnóstico Real de Mercado)</p>
+                <div className="diag-grid">
                     {/* Pilar 1: Seu Preço */}
-                    <div>
-                        <span style={{ fontSize: "0.85rem", color: "#94a3b8", fontWeight: "600" }}>Valor anunciado</span>
-                        <h3 style={{ fontSize: "2.4rem", fontWeight: "900", margin: "12px 0", color: "#fff" }}>{formatCurrency(input.valor_teste || 0)}</h3>
+                    <div className="diag-col">
+                        <span className="diag-label">Valor anunciado</span>
+                        <h3 className="diag-value">{formatCurrency(input.valor_teste || 0)}</h3>
                         {analysis?.delta_teste_mercado !== undefined && (
-                            <span style={{ fontSize: "0.9rem", color: analysis.delta_teste_mercado > 0 ? "#f87171" : "#4ade80", fontWeight: "700" }}>
+                            <span className={`diag-badge ${analysis.delta_teste_mercado > 0 ? 'red' : 'green'}`}>
                                 {analysis.delta_teste_mercado > 0 ? "ACIMA DA MÉDIA" : "EXCELENTE PREÇO"} 
                                 ({Math.abs(analysis.delta_teste_mercado)}%)
                             </span>
@@ -307,45 +307,45 @@ function PricingContent() {
                     </div>
 
                     {/* Pilar 2: Média WebMotors */}
-                    <div style={{ borderLeft: "1px solid #374151", paddingLeft: "40px" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "12px" }}>
-                            <img src="https://www.webmotors.com.br/assets/img/logo-webmotors.svg" alt="Webmotors" style={{ height: "18px", filter: "brightness(0) invert(1)" }} />
+                    <div className="diag-col border-left">
+                        <div className="brand-logo-container">
+                            <img src="https://www.webmotors.com.br/assets/img/logo-webmotors.svg" alt="Webmotors" className="brand-logo-invert" />
                         </div>
-                        <h3 style={{ fontSize: "2.4rem", fontWeight: "900", margin: "12px 0", color: "#fff" }}>{formatCurrency(analysis?.media_mercado || 0)}</h3>
-                        <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0 }}>Valor médio real consultado hoje</p>
+                        <h3 className="diag-value">{formatCurrency(analysis?.media_mercado || 0)}</h3>
+                        <p className="diag-subtext">Média real hoje</p>
                     </div>
 
                     {/* Pilar 3: FIPE */}
-                    <div style={{ borderLeft: "1px solid #374151", paddingLeft: "40px" }}>
-                        <span style={{ fontSize: "0.85rem", color: "#4ade80", fontWeight: "900", textTransform: "uppercase" }}>fipe</span>
-                        <h3 style={{ fontSize: "2.4rem", fontWeight: "900", margin: "12px 0", color: "#fff" }}>{formatCurrency(input.fipe || 0)}</h3>
-                        <p style={{ fontSize: "0.8rem", color: "#94a3b8", margin: 0 }}>Referência oficial Brasil</p>
+                    <div className="diag-col border-left">
+                        <span className="diag-label green-text">FIPE</span>
+                        <h3 className="diag-value">{formatCurrency(input.fipe || 0)}</h3>
+                        <p className="diag-subtext">Referência oficial</p>
                     </div>
                 </div>
             </div>
 
             {/* Cards de Destaque Detalhado */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div className="summary-grid">
                 {/* Score de Liquidez */}
-                <div style={{ background: "white", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0" }}>
+                <div className="summary-card">
                     <p style={labelMiniStyle}>Liquidez Estimada</p>
-                    <div style={{ display: "flex", alignItems: "center", gap: "16px", marginTop: "12px" }}>
-                        <div style={{ flex: 1, height: "12px", background: "#f1f5f9", borderRadius: "6px", overflow: "hidden" }}>
-                            <div style={{ width: analysis?.liquidez === "ALTA" ? "100%" : analysis?.liquidez === "MEDIA" ? "60%" : "25%", height: "100%", background: "#3b82f6" }} />
+                    <div className="liquidez-container">
+                        <div className="progress-bg">
+                            <div className="progress-bar" style={{ width: analysis?.liquidez === "ALTA" ? "100%" : analysis?.liquidez === "MEDIA" ? "60%" : "25%" }} />
                         </div>
-                        <span style={{ fontWeight: "800", color: "#1e293b" }}>{analysis?.liquidez}</span>
+                        <span className="liquidez-text">{analysis?.liquidez}</span>
                     </div>
                 </div>
 
                 {/* Card Especialista */}
                 {analysis && (
-                    <div style={{ background: "#f8fafc", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", position: "relative" }}>
-                        <div style={{ position: "absolute", top: "32px", right: "32px" }}>
+                    <div className="expert-card">
+                        <div className="expert-icon">
                            {analysis.classificacao === "FORTE" ? <TrendingUp size={32} color="#10b981" /> : <TrendingDown size={32} color="#3b82f6" />}
                         </div>
                         <p style={labelMiniStyle}>Oportunidade de Compra</p>
-                        <h2 style={{ fontSize: "1.8rem", fontWeight: "900", color: "#1e293b", margin: "8px 0" }}>Margem de {analysis.margem_estimada}%</h2>
-                        <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#64748b" }}>SUGESTÃO DE PAGAMENTO: {formatCurrency(analysis.preco_compra_sugerido)}</span>
+                        <h2 className="expert-title">Margem de {analysis.margem_estimada}%</h2>
+                        <span className="expert-subtitle">SUGESTÃO: {formatCurrency(analysis.preco_compra_sugerido)}</span>
                     </div>
                 )}
             </div>
@@ -437,9 +437,77 @@ function PricingContent() {
       )}
 
       <style jsx>{`
+        .main-container { maxWidth: 1400px; margin: 0 auto; padding: 20px; color: #0f172a; }
+        .page-header { margin-bottom: 48px; display: flex; justify-content: space-between; align-items: center; }
+        .title-main { font-size: 2.5rem; font-weight: 900; color: #0f172a; margin-bottom: 8px; letter-spacing: -1px; }
+        .subtitle { color: #64748b; font-size: 1.1rem; font-weight: 500; }
+        .badge-mode { background: #eff6ff; padding: 12px 20px; border-radius: 16px; border: 1px solid #dbeafe; }
+        .badge-text { font-size: 0.85rem; font-weight: 700; color: #1e40af; display: flex; align-items: center; gap: 8px; }
+        
+        .search-section { background: white; padding: 24px; border-radius: 24px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); display: flex; gap: 16px; align-items: flex-end; margin-bottom: 40px; }
+        .fipe-facilitator { background: #f8fafc; padding: 16px 24px; margin-bottom: 20px; }
+        
+        .input-group { flex: 1; min-width: 150px; }
+        .input-group-sm { flex: 0.8; min-width: 80px; }
+        .input-group-lg { flex: 1.5; min-width: 200px; }
+        .input-group-xl { flex: 2; min-width: 300px; }
+        
+        .premium-input { width: 100%; padding: 14px 18px; border-radius: 16px; border: 1px solid #f1f5f9; background: #f8fafc; font-size: 1rem; font-weight: 600; outline: none; color: #1e293b; transition: all 0.2s; }
+        .premium-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .premium-input.highlight { border-color: #3b82f6; color: #2563eb; font-weight: 800; }
+        .premium-input.gray { background: #f1f5f9; border-color: #cbd5e1; }
+        .premium-select { width: 100%; padding: 10px 14px; border-radius: 16px; border: 1px solid #f1f5f9; background: white; font-size: 1rem; font-weight: 600; outline: none; color: #1e293b; transition: all 0.2s; height: 48px; }
+        
+        .btn-search { background: #2563eb; color: white; border: none; padding: 14px 32px; border-radius: 16px; font-size: 1rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.3s; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); height: 48px; white-space: nowrap; }
+        .btn-search:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-search:disabled { background: #93c5fd; cursor: not-allowed; transform: none; }
+        
+        .ref-text { font-size: 0.65rem; color: #94a3b8; font-weight: 700; margin-top: 4px; display: block; }
+        
+        .diagnostic-card { background: #111827; padding: 40px; border-radius: 32px; color: white; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .card-label-light { font-size: 0.7rem; font-weight: 800; color: #94a3b8; margin-bottom: 24px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .diag-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; align-items: center; }
+        .diag-col { display: flex; flex-direction: column; }
+        .diag-label { font-size: 0.85rem; color: #94a3b8; font-weight: 600; }
+        .diag-value { font-size: 2.4rem; font-weight: 900; margin: 12px 0; color: #fff; }
+        .diag-badge { font-size: 0.9rem; font-weight: 700; padding: 4px 8px; border-radius: 6px; align-self: flex-start; }
+        .diag-badge.red { color: #f87171; background: rgba(248, 113, 113, 0.1); }
+        .diag-badge.green { color: #4ade80; background: rgba(74, 222, 128, 0.1); }
+        .border-left { border-left: 1px solid #374151; padding-left: 40px; }
+        .brand-logo-container { height: 18px; margin-bottom: 12px; }
+        .brand-logo-invert { height: 100%; filter: brightness(0) invert(1); }
+        .diag-subtext { font-size: 0.8rem; color: #94a3b8; margin: 0; }
+        .green-text { color: #4ade80; font-weight: 900; text-transform: uppercase; }
+
+        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+        .summary-card { background: white; padding: 32px; border-radius: 32px; border: 1px solid #e2e8f0; }
+        .liquidez-container { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+        .progress-bg { flex: 1; height: 12px; background: #f1f5f9; border-radius: 6px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #3b82f6; transition: width 1s ease-in-out; }
+        .liquidez-text { font-weight: 800; color: #1e293b; min-width: 60px; }
+
+        .expert-card { background: #f8fafc; padding: 32px; border-radius: 32px; border: 1px solid #e2e8f0; position: relative; }
+        .expert-icon { position: absolute; top: 32px; right: 32px; }
+        .expert-title { font-size: 1.8rem; font-weight: 900; color: #1e293b; margin: 8px 0; }
+        .expert-subtitle { font-size: 0.85rem; font-weight: 700; color: #64748b; }
+
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .spin { animation: spin 2s linear infinite; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        @media (max-width: 1024px) {
+          .diag-grid { grid-template-columns: 1fr; gap: 32px; }
+          .border-left { border-left: none; padding-left: 0; padding-top: 24px; border-top: 1px solid #374151; }
+          .summary-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+          .page-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+          .search-section { flex-direction: column; align-items: stretch; gap: 20px; }
+          .title-main { font-size: 2rem; }
+          .diag-value { font-size: 2rem; }
+          .btn-search { width: 100%; }
+        }
       `}</style>
     </div>
   );
