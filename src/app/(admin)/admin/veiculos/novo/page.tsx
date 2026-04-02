@@ -179,6 +179,7 @@ export default function NovoVeiculoPage() {
         isIpvaPago: formData.get("isIpvaPago") === "on",
         isAlienado: formData.get("isAlienado") === "on",
         isGarantia: formData.get("isGarantia") === "on",
+        plate: formData.get("plate") as string,
         imageUrls
       };
  
@@ -391,6 +392,11 @@ export default function NovoVeiculoPage() {
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px", color: "var(--text-dark)" }}>Preço (R$) *</label>
             <input ref={priceRef} step="0.01" required type="number" name="price" placeholder="Ex: 85000" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-color)" }} />
           </div>
+        </div>
+
+        <div>
+          <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px", color: "var(--text-dark)" }}>Placa (Opcional)</label>
+          <input type="text" name="plate" placeholder="Ex: ABC-1234 ou ABC1D23" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", background: "var(--bg-color)" }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>

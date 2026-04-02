@@ -75,6 +75,7 @@ export interface CreateVehicleInput {
   isIpvaPago?: boolean;
   isAlienado?: boolean;
   isGarantia?: boolean;
+  plate?: string;
 }
  
 export async function createVehicle(input: CreateVehicleInput) {
@@ -107,7 +108,8 @@ export async function createVehicle(input: CreateVehicleInput) {
         isLeilao: !!input.isLeilao,
         isIpvaPago: !!input.isIpvaPago,
         isAlienado: !!input.isAlienado,
-        isGarantia: !!input.isGarantia
+        isGarantia: !!input.isGarantia,
+        plate: input.plate || null
       }
     });
  
@@ -133,5 +135,50 @@ export async function createVehicle(input: CreateVehicleInput) {
       error: userMessage,
       digest: error.digest // Manter suporte ao digest do Next.js se existir
     };
+  }
+}
+
+export async function updateVehicle(id: string, input: CreateVehicleInput) {
+  try {
+    const result = await prisma.vehicle.update({
+      where: { id },
+      data: {
+        name: input.name,
+        price: Number(input.price),
+        year: Number(input.year),
+        km: Number(input.km),
+        gearbox: input.gearbox,
+        type: input.type,
+        options: input.options,
+        description: input.description,
+        status: input.status,
+        images: JSON.stringify(input.imageUrls),
+        isLeilao: !!input.isLeilao,
+        isIpvaPago: !!input.isIpvaPago,
+        isAlienado: !!input.isAlienado,
+        isGarantia: !!input.isGarantia,
+        plate: input.plate || null
+      }
+    });
+
+    revalidatePath("/catalogo");
+    revalidatePath(`/catalogo/${id}`);
+    revalidatePath("/admin");
+    return { success: true };
+  } catch (error: any) {
+    console.error("V-ACTION-ERROR [updateVehicle]:", error);
+    return { success: false, error: "Erro ao atualizar veículo." };
+  }
+}
+
+export async function getVehicleById(id: string) {
+  try {
+    const vehicle = await prisma.vehicle.findUnique({
+      where: { id }
+    });
+    return vehicle;
+  } catch (error) {
+    console.error("Error fetching vehicle:", error);
+    return null;
   }
 }

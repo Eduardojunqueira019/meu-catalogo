@@ -22,6 +22,7 @@ model Vehicle {
   options     String   // Opcionais (JSON ou string separada por vírgulas)
   description String
   images      String   // JSON string of arrays
+  plate       String?  // Placa (opcional)
   status      String   @default("disponivel") // disponivel, vendido
   
   // Novas características dinâmicas

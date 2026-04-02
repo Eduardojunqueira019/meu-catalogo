@@ -48,20 +48,13 @@ export default async function AdminDashboardPage() {
           </div>
         ) : (
           vehicles.map((v) => {
-            let imageUrl = "/placeholder-car.jpg";
-            try {
-              if (v.images) {
-                const images = JSON.parse(v.images);
-                if (images.length > 0) imageUrl = images[0];
-              }
-            } catch (e) {}
-
-            // Mocked labels to match the provided design
-            const plate = `PER-7C${v.id.substring(0, 2).toUpperCase()}`;
+            const imageUrls = JSON.parse(v.images || "[]");
+            const imageUrl = imageUrls[0] || "https://placehold.co/600x400?text=Sem+Foto";
+            const plate = v.plate ? v.plate.toUpperCase() : "S/ PLACA";
 
             return (
               <div key={v.id} className={styles.vehicleCard}>
-                <Link href={`/catalogo/${v.id}`} className={styles.cardClickableArea} target="_blank">
+                <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.cardClickableArea}>
                   <div className={styles.cardMain}>
                     {/* Left: Image Section */}
                     <div className={styles.imageSection}>
