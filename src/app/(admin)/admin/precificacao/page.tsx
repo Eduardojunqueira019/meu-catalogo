@@ -16,8 +16,17 @@ import {
   RefreshCcw,
   LucideIcon,
   Info,
-  Search
+  Search,
+  ArrowRight,
+  Globe,
+  LayoutDashboard
 } from "lucide-react";
+
+interface PlatformSummary {
+    avg: number;
+    count: number;
+    prices: number[];
+}
 
 function PricingContent() {
   const searchParams = useSearchParams();
@@ -30,6 +39,15 @@ function PricingContent() {
     fipe: 0,
     precos_mercado: []
   });
+
+  const [platformData, setPlatformData] = useState<Record<string, PlatformSummary> | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [analysis, setAnalysis] = useState<PricingAnalysis | null>(null);
+  const [error, setError] = useState("");
+
+  const formatCurrency = (val: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(val);
+  };
 
   useEffect(() => {
     const name = searchParams.get("name");
@@ -49,11 +67,6 @@ function PricingContent() {
     }
   }, [searchParams]);
   
-  const [rawPrices, setRawPrices] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
-  const [analysis, setAnalysis] = useState<PricingAnalysis | null>(null);
-  const [error, setError] = useState("");
-
   const handleAISearch = async () => {
     if (!input.veiculo || !input.ano) {
       setError("Preencha o Nome e Ano para que a IA possa pesquisar o mercado.");
@@ -62,6 +75,8 @@ function PricingContent() {
     
     setError("");
     setIsSearching(true);
+    setPlatformData(null);
+    setAnalysis(null);
     
     try {
       const res = await fetch("/api/precificacao/search-market", {
@@ -72,177 +87,212 @@ function PricingContent() {
       
       const data = await res.json();
       
-      if (data.success) {
-        const prices = data.prices.join(", ");
-        setRawPrices(prices);
-      } else if (data.needsApiKey) {
-        setError(`⚠️ ${data.message} (Exemplos carregados: ${data.mockData.join(", ")})`);
-        setRawPrices(data.mockData.join(", "));
+      if (data.success || data.needsApiKey) {
+        setPlatformData(data.platformSummaries);
+        if (data.needsApiKey) {
+            setError(`⚠️ Usando dados de demonstração (Configure SERPER_API_KEY no Vercel para dados em tempo real).`);
+        }
+        
+        // Agregar todos os preços para a análise estratégica final
+        const allPrices: number[] = [];
+        Object.values(data.platformSummaries).forEach((p: any) => {
+            allPrices.push(...p.prices);
+        });
+        
+        if (allPrices.length >= 3 && input.fipe) {
+           const result = analyzePricing({
+                veiculo: input.veiculo || "",
+                ano: input.ano || 2024,
+                versao: "",
+                km: Number(input.km) || 0,
+                fipe: Number(input.fipe),
+                precos_mercado: allPrices
+          });
+          setAnalysis(result);
+        }
       } else {
-        throw new Error(data.error || "Erro desconhecido na busca IA.");
+        throw new Error(data.error || "Erro técnico na busca.");
       }
     } catch (err: any) {
-      setError("Falha na Pesquisa IA: " + err.message);
+      setError("Falha na conexão com o motor de IA: " + err.message);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleAnalyze = () => {
-    setError("");
-    try {
-      const prices = rawPrices
-        .split(/[\s,;\n]+/)
-        .map(p => p.replace(/\D/g, ""))
-        .filter(p => p.length > 0)
-        .map(Number);
-        
-      if (prices.length < 3) {
-        throw new Error("Insira pelo menos 3 preços de mercado para uma análise mínima.");
-      }
-
-      if (!input.fipe || input.fipe <= 0) {
-        throw new Error("O valor da FIPE é obrigatório.");
-      }
-
-      const result = analyzePricing({
-        veiculo: input.veiculo || "Veículo não identificado",
-        ano: input.ano || 2024,
-        versao: input.versao || "",
-        km: Number(input.km) || 0,
-        fipe: Number(input.fipe),
-        precos_mercado: prices
-      });
-
-      setAnalysis(result);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
-  };
+  const platforms = [
+    { id: "webmotors", name: "WebMotors", logo: "https://www.webmotors.com.br/assets/img/logo-webmotors.svg", color: "#e21a2c" },
+    { id: "olx", name: "OLX Brasil", logo: "https://static.olx.com.br/cdfe/static-common/logo.svg", color: "#6e0ad6" },
+    { id: "icarros", name: "iCarros", logo: "https://img0.icarros.com.br/newsletter/img/logo_icarros.png", color: "#005baa" },
+    { id: "facebook", name: "FB Marketplace", logo: "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg", color: "#0668E1" }
+  ];
 
   return (
-    <div style={{ maxWidth: "1200px" }}>
-      <div style={{ marginBottom: "40px" }}>
-        <h1 style={{ fontSize: "2.2rem", fontWeight: "800", color: "#0f172a", marginBottom: "8px", display: "flex", alignItems: "center", gap: "12px" }}>
-          <TrendingUp size={36} color="#3b82f6" /> Analista de Preços
-        </h1>
-        <p style={{ color: "#64748b", fontSize: "1.1rem" }}>
-          Ferramenta estratégica para decisão de compra e precificação de estoque.
-        </p>
-      </div>
+    <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px", color: "#0f172a" }}>
+      {/* Header Premium com Gradiente */}
+      <header style={{ marginBottom: "48px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h1 style={{ fontSize: "2.5rem", fontWeight: "900", color: "#0f172a", marginBottom: "8px", letterSpacing: "-1px" }}>
+            Negociação <span style={{ color: "#3b82f6" }}>Inteligente</span>
+          </h1>
+          <p style={{ color: "#64748b", fontSize: "1.1rem", fontWeight: "500" }}>
+            Compare preços reais em múltiplos canais antes de fechar o negócio.
+          </p>
+        </div>
+        <div style={{ background: "#eff6ff", padding: "12px 20px", borderRadius: "16px", border: "1px solid #dbeafe" }}>
+            <span style={{ fontSize: "0.85rem", fontWeight: "700", color: "#1e40af", display: "flex", alignItems: "center", gap: "8px" }}>
+                <Globe size={18} /> MODO: PESQUISA MULTICANAL
+            </span>
+        </div>
+      </header>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "32px", alignItems: "start" }}>
-        <section style={{ background: "white", padding: "32px", borderRadius: "20px", boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.05)", border: "1px solid #e2e8f0" }}>
-          <h2 style={{ fontSize: "1.2rem", fontWeight: "700", color: "#1e293b", marginBottom: "24px", display: "flex", alignItems: "center", gap: "8px" }}>
-             <Zap size={20} color="#3b82f6" /> Dados do Veículo
-          </h2>
+      {/* Seção de Entrada (Pesquisa) */}
+      <section style={searchBarContainerStyle}>
+        <div style={{ flex: 2 }}>
+            <label style={labelMiniStyle}>O que você está negociando?</label>
+            <input type="text" placeholder="Ex: Honda Civic G10, Corolla 2020..." value={input.veiculo} onChange={e => setInput({...input, veiculo: e.target.value})} style={inputPremiumStyle} />
+        </div>
+        <div style={{ flex: 0.8 }}>
+            <label style={labelMiniStyle}>Ano</label>
+            <input type="number" value={input.ano} onChange={e => setInput({...input, ano: Number(e.target.value)})} style={inputPremiumStyle} />
+        </div>
+        <div style={{ flex: 1.2 }}>
+            <label style={labelMiniStyle}>Tabela FIPE (R$)</label>
+            <input type="number" placeholder="Valor ref." value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} style={{ ...inputPremiumStyle, borderColor: "#3b82f6", color: "#2563eb", fontWeight: "800" }} />
+        </div>
+        <button onClick={handleAISearch} disabled={isSearching} style={btnMainStyle}>
+            {isSearching ? <RefreshCcw size={20} className="spin" /> : <Zap size={20} />} 
+            {isSearching ? "Buscando Preços..." : "Avaliar Agora"}
+        </button>
+      </section>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      {error && (
+        <div style={{ marginBottom: "32px", padding: "16px 24px", background: "#fef2f2", borderLeft: "4px solid #ef4444", borderRadius: "8px", color: "#991b1b", fontWeight: "600", display: "flex", alignItems: "center", gap: "12px" }}>
+            <AlertTriangle size={20} /> {error}
+        </div>
+      )}
+
+      {/* Main Dashboard Result */}
+      {platformData ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+            
+            {/* Cards de Destaque Superior */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: "24px" }}>
+                {/* Card FIPE */}
+                <div style={{ background: "white", padding: "32px", borderRadius: "32px", border: "1px solid #e2e8f0", position: "relative", overflow: "hidden" }}>
+                    <div style={{ position: "absolute", right: "-10px", bottom: "-10px", opacity: 0.05 }}><DollarSign size={120} /></div>
+                    <p style={labelMiniStyle}>Referência Oficial</p>
+                    <h2 style={{ fontSize: "2.8rem", fontWeight: "900", color: "#1e293b", margin: "8px 0" }}>{formatCurrency(input.fipe || 0)}</h2>
+                    <span style={{ fontSize: "0.8rem", fontWeight: "700", color: "#64748b" }}>FONTE: TABELA FIPE (BRASIL)</span>
+                </div>
+
+                {/* Card Especialista */}
+                {analysis && (
+                    <div style={{ background: "#0f172a", padding: "32px", borderRadius: "32px", color: "white", position: "relative" }}>
+                        <div style={{ position: "absolute", top: "32px", right: "32px" }}>
+                           {analysis.classificacao === "FORTE" ? <TrendingUp size={40} color="#10b981" /> : <TrendingDown size={40} color="#3b82f6" />}
+                        </div>
+                        <p style={{ ...labelMiniStyle, color: "#94a3b8" }}>Diagnóstico do Especialista</p>
+                        <h2 style={{ fontSize: "2.8rem", fontWeight: "900", marginBottom: "8px" }}>Mercado {analysis.classificacao}</h2>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                           <div style={{ background: "#1e293b", padding: "8px 16px", borderRadius: "12px", border: "1px solid #334155" }}>
+                               <span style={{ fontSize: "0.8rem", color: "#94a3b8", fontWeight: "700" }}>PAGAR ATÉ:</span>
+                               <p style={{ fontSize: "1.2rem", fontWeight: "900", margin: 0 }}>{formatCurrency(analysis.preco_compra_sugerido)}</p>
+                           </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Comparativo WebMotors / OLX / iCarros / Facebook */}
             <div>
-              <label style={labelStyle}>Veículo / Modelo</label>
-              <input required type="text" placeholder="Ex: Toyota Corolla XEi" value={input.veiculo} onChange={e => setInput({...input, veiculo: e.target.value})} style={inputStyle} />
+               <h3 style={{ fontSize: "1.2rem", fontWeight: "800", marginBottom: "20px", display: "flex", alignItems: "center", gap: "12px" }}>
+                 <BarChart3 size={20} color="#3b82f6" /> Comparativo Detalhado por Plataforma
+               </h3>
+               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "20px" }}>
+                 {platforms.map(p => {
+                    const data = platformData[p.id];
+                    const hasData = data && data.count > 0;
+                    const diff = hasData && input.fipe ? ((data.avg - input.fipe) / input.fipe) * 100 : 0;
+                    
+                    return (
+                        <div key={p.id} style={{ ...platformCardStyle, opacity: hasData ? 1 : 0.6, transform: hasData ? "scale(1)" : "scale(0.98)" }}>
+                           <div style={{ height: "45px", marginBottom: "24px", display: "flex", alignItems: "center" }}>
+                               <img src={p.logo} alt={p.name} style={{ maxHeight: "100%", maxWidth: "150px", objectFit: "contain", filter: hasData ? "none" : "grayscale(1)" }} />
+                           </div>
+                           
+                           {hasData ? (
+                               <div>
+                                  <p style={{ fontSize: "0.8rem", fontWeight: "700", color: "#64748b", margin: 0 }}>Preço Médio Anunciado</p>
+                                  <h4 style={{ fontSize: "1.8rem", fontWeight: "900", color: "#1e293b", margin: "4px 0" }}>{formatCurrency(data.avg)}</h4>
+                                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px" }}>
+                                     <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "700" }}>{data.count} anúncios</span>
+                                     <div style={{ padding: "4px 10px", borderRadius: "8px", background: diff > 0 ? "#f0fdf4" : "#fef2f2", color: diff > 0 ? "#16a34a" : "#dc2626", fontSize: "0.8rem", fontWeight: "800" }}>
+                                        {diff > 0 ? "+" : ""}{diff.toFixed(1)}% FIPE
+                                     </div>
+                                  </div>
+                               </div>
+                           ) : (
+                               <div style={{ padding: "20px 0", textAlign: "center", color: "#cbd5e1" }}>
+                                  <p style={{ margin: 0, fontWeight: "600", fontSize: "0.9rem" }}>Sem dados ativos hoje</p>
+                               </div>
+                           )}
+                        </div>
+                    );
+                 })}
+               </div>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-              <div>
-                <label style={labelStyle}>Ano</label>
-                <input type="number" value={input.ano} onChange={e => setInput({...input, ano: Number(e.target.value)})} style={inputStyle} />
-              </div>
-              <div>
-                <label style={labelStyle}>KM</label>
-                <input type="number" value={input.km} onChange={e => setInput({...input, km: Number(e.target.value)})} style={inputStyle} />
-              </div>
-            </div>
+            {/* Parecer final */}
+            {analysis && (
+                <div style={{ background: "white", padding: "40px", borderRadius: "32px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)" }}>
+                    <div style={{ display: "flex", gap: "48px" }}>
+                        <div style={{ flex: 2 }}>
+                           <h4 style={{ fontSize: "1.2rem", fontWeight: "800", marginBottom: "16px", display: "flex", alignItems: "center", gap: "12px" }}>
+                              <ShieldCheck color="#2563eb" /> Resumo Estratégico
+                           </h4>
+                           <p style={{ fontSize: "1.1rem", lineHeight: "1.8", color: "#475569", margin: 0 }}>
+                              {analysis.analise_resumida}
+                           </p>
+                        </div>
+                        <div style={{ flex: 1, borderLeft: "2px solid #f1f5f9", paddingLeft: "48px" }}>
+                           <h4 style={{ fontSize: "1rem", fontWeight: "800", marginBottom: "16px" }}>Pontos de Atenção</h4>
+                           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                              {analysis.riscos.length > 0 ? (
+                                  analysis.riscos.map((r, i) => (
+                                      <div key={i} style={{ display: "flex", gap: "10px" }}>
+                                          <AlertTriangle size={18} color="#f59e0b" style={{ flexShrink: 0 }} />
+                                          <p style={{ fontSize: "0.85rem", color: "#64748b", margin: 0 }}>{r}</p>
+                                      </div>
+                                  ))
+                              ) : (
+                                  <p style={{ color: "#10b981", fontSize: "0.9rem", fontWeight: "600" }}>Nenhum risco detectado.</p>
+                              )}
+                           </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-            <div>
-              <label style={labelStyle}>Valor FIPE (R$)</label>
-              <input type="number" placeholder="Quanto vale na tabela?" value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} style={{ ...inputStyle, fontWeight: "700", color: "#3b82f6" }} />
-            </div>
-
-            <div style={{ position: "relative" }}>
-              <label style={labelStyle}>Preços de Mercado (Analise Concorrente)</label>
-              <button 
-                onClick={handleAISearch}
-                disabled={isSearching}
-                style={{ 
-                  position: "absolute", 
-                  top: 0, 
-                  right: 0, 
-                  fontSize: "0.75rem", 
-                  background: "#eff6ff", 
-                  color: "#2563eb", 
-                  border: "1px solid #bfdbfe", 
-                  padding: "4px 8px", 
-                  borderRadius: "6px", 
-                  cursor: "pointer",
-                  fontWeight: "700",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "4px"
-                }}
-              >
-                 {isSearching ? <RefreshCcw size={12} className="spin" /> : <Search size={12} />} 
-                 {isSearching ? "Pesquisando IA..." : "🔍 Pesquisa IA"}
-              </button>
-              <textarea placeholder="Ex: 85000, 89900, 87500, 92000..." value={rawPrices} onChange={e => setRawPrices(e.target.value)} rows={5} style={{ ...inputStyle, resize: "none" }} />
-            </div>
-
-            {error && <div style={{ padding: "12px", background: "#fef2f2", color: "#991b1b", borderRadius: "8px", fontSize: "0.85rem", border: "1px solid #fee2e2" }}><strong>Atenção:</strong> {error}</div>}
-
-            <button onClick={handleAnalyze} style={{ background: "#0f172a", color: "white", border: "none", padding: "16px", borderRadius: "12px", fontSize: "1rem", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-              <BarChart3 size={20} /> Gerar Análise Especialista
+            <button onClick={() => setPlatformData(null)} style={{ alignSelf: "center", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontWeight: "700", display: "flex", alignItems: "center", gap: "8px", fontSize: "0.9rem" }}>
+                <RefreshCcw size={16} /> Fazer Nova Pesquisa
             </button>
-          </div>
-        </section>
 
-        <section style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          {!analysis ? (
-            <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f8fafc", borderRadius: "20px", border: "1px dashed #cbd5e1", padding: "60px", textAlign: "center" }}>
-              <div style={{ background: "white", padding: "20px", borderRadius: "50%", marginBottom: "20px" }}><TrendingUp size={40} color="#cbd5e1" /></div>
-              <h3 style={{ color: "#64748b", margin: 0 }}>Aguardando Dados</h3>
-            </div>
-          ) : (
-            <>
-              <div style={{ background: "white", padding: "24px", borderRadius: "20px", border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ color: "#64748b", fontSize: "0.85rem", marginBottom: "4px", fontWeight: "600" }}>Classificação de Mercado</p>
-                  <span style={{ fontSize: "1.5rem", fontWeight: "900", color: analysis.classificacao === "FORTE" ? "#10b981" : analysis.classificacao === "NORMAL" ? "#3b82f6" : "#f59e0b" }}>{analysis.classificacao}</span>
-                </div>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
-                 <div style={{ background: "#0f172a", color: "white", padding: "24px", borderRadius: "20px" }}>
-                   <p style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "700" }}>Sugestão de Compra</p>
-                   <h3 style={{ fontSize: "1.8rem", fontWeight: "900" }}>{formatCurrency(analysis.preco_compra_sugerido)}</h3>
-                 </div>
-                 <div style={{ background: "white", padding: "24px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
-                   <p style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "700" }}>Média de Mercado</p>
-                   <h3 style={{ fontSize: "1.8rem", fontWeight: "900" }}>{formatCurrency(analysis.media_mercado)}</h3>
-                 </div>
-              </div>
-
-              <div style={{ background: "#f8fafc", padding: "24px", borderRadius: "20px", border: "1px solid #e2e8f0" }}>
-                <p style={{ margin: 0, color: "#475569", lineHeight: "1.6" }}>{analysis.analise_resumida}</p>
-              </div>
-
-              {analysis.riscos.length > 0 && (
-                <div style={{ background: "#fffaf0", padding: "24px", borderRadius: "20px", border: "1px solid #feebc8" }}>
-                  <h4 style={{ margin: "0 0 16px", fontSize: "1rem", color: "#9c4221" }}>Pontos de Atenção</h4>
-                  {analysis.riscos.map((r, i) => <p key={i} style={{ color: "#9c4221", fontSize: "0.9rem", margin: "4px 0" }}>• {r}</p>)}
-                </div>
-              )}
-
-              <button onClick={() => setAnalysis(null)} style={{ background: "transparent", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: "0.85rem" }}><RefreshCcw size={14} /> Nova Análise</button>
-            </>
-          )}
-        </section>
-      </div>
+        </div>
+      ) : (
+        /* Estado Vazio */
+        <div style={emptyStateStyle}>
+           <div style={{ width: "80px", height: "80px", background: "white", borderRadius: "24px", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}>
+                <LayoutDashboard size={32} color="#3b82f6" />
+           </div>
+           <h2 style={{ fontSize: "1.5rem", fontWeight: "800", marginBottom: "12px" }}>Inicie a Avaliação</h2>
+           <p style={{ color: "#64748b", maxWidth: "400px", margin: "0 auto" }}>Digite o nome e ano do carro acima para que nossa IA busque os preços reais no WebMotors, OLX, iCarros e Facebook.</p>
+        </div>
+      )}
 
       <style jsx>{`
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { animation: spin 2s linear infinite; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
       `}</style>
     </div>
@@ -251,11 +301,16 @@ function PricingContent() {
 
 export default function PrecificacaoPage() {
   return (
-    <Suspense fallback={<div>Carregando Analista...</div>}>
+    <Suspense fallback={<div>Preparando Inteligência de Mercado...</div>}>
       <PricingContent />
     </Suspense>
   );
 }
 
-const labelStyle: React.CSSProperties = { display: "block", fontSize: "0.85rem", fontWeight: "700", color: "#475569", marginBottom: "8px", textTransform: "uppercase" };
-const inputStyle: React.CSSProperties = { width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid #cbd5e1", fontSize: "1rem", outline: "none" };
+// Estilos Reutilizáveis
+const searchBarContainerStyle: React.CSSProperties = { background: "white", padding: "24px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)", display: "flex", gap: "16px", alignItems: "flex-end", marginBottom: "40px" };
+const labelMiniStyle: React.CSSProperties = { display: "block", fontSize: "0.7rem", fontWeight: "800", color: "#94a3b8", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" };
+const inputPremiumStyle: React.CSSProperties = { width: "100%", padding: "14px 18px", borderRadius: "16px", border: "1px solid #f1f5f9", background: "#f8fafc", fontSize: "1rem", fontWeight: "600", outline: "none", color: "#1e293b", transition: "all 0.2s" };
+const btnMainStyle: React.CSSProperties = { background: "#2563eb", color: "white", border: "none", padding: "14px 32px", borderRadius: "16px", fontSize: "1rem", fontWeight: "800", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", transition: "all 0.3s", boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)" };
+const platformCardStyle: React.CSSProperties = { background: "white", padding: "24px", borderRadius: "24px", border: "1px solid #e2e8f0", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.02)", transition: "all 0.3s" };
+const emptyStateStyle: React.CSSProperties = { padding: "100px 40px", textAlign: "center", background: "white", borderRadius: "40px", border: "2px dashed #cbd5e1" };
