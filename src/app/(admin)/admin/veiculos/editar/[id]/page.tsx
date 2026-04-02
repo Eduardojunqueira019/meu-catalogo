@@ -14,83 +14,74 @@ export default function EditarVeiculoPage() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const router = useRouter();
 
+  // Form States (Controlled Components for reliability)
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [year, setYear] = useState("");
+  const [km, setKm] = useState("");
+  const [gearbox, setGearbox] = useState("Automático");
+  const [type, setType] = useState("sedan");
+  const [status, setStatus] = useState("disponivel");
+  const [plate, setPlate] = useState("");
+  const [options, setOptions] = useState("");
+  const [description, setDescription] = useState("");
+  
+  // Checkbox States
+  const [isLeilao, setIsLeilao] = useState(false);
+  const [isIpvaPago, setIsIpvaPago] = useState(false);
+  const [isAlienado, setIsAlienado] = useState(false);
+  const [isGarantia, setIsGarantia] = useState(false);
+
   // Facilitador States
   const [apiType, setApiType] = useState<"carros" | "motos">("carros");
   const [brands, setBrands] = useState<{codigo: string, nome: string}[]>([]);
   const [models, setModels] = useState<{codigo: string, nome: string}[]>([]);
-
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
-  const [vehicleName, setVehicleName] = useState("");
   
   // AI States
   const [aiLoading, setAiLoading] = useState<string | false>(false);
-  const [aiError, setAiError] = useState("");
-  
-  // Options AI State
-  const [optionsLoading, setOptionsLoading] = useState(false);
-  const [optionsError, setOptionsError] = useState("");
-
-  // Import States
-  const [importLoading, setImportLoading] = useState(false);
-  const [importError, setImportError] = useState("");
-  const importUrlRef = useRef<HTMLInputElement>(null);
-
-  // Form Refs
-  const descriptionRef = useRef<HTMLTextAreaElement>(null);
-  const yearRef = useRef<HTMLInputElement>(null);
-  const kmRef = useRef<HTMLInputElement>(null);
-  const optionsRef = useRef<HTMLInputElement>(null);
-  const priceRef = useRef<HTMLInputElement>(null);
-  const plateRef = useRef<HTMLInputElement>(null);
-  const gearboxRef = useRef<HTMLSelectElement>(null);
-  const typeRef = useRef<HTMLSelectElement>(null);
-  const statusRef = useRef<HTMLSelectElement>(null);
-  
-  // Checkbox Refs
-  const isLeilaoRef = useRef<HTMLInputElement>(null);
-  const isIpvaPagoRef = useRef<HTMLInputElement>(null);
-  const isAlienadoRef = useRef<HTMLInputElement>(null);
-  const isGarantiaRef = useRef<HTMLInputElement>(null);
 
   // Initial Load
   useEffect(() => {
     async function loadVehicle() {
-      const vehicle = await getVehicleById(id);
-      if (vehicle) {
-        setVehicleName(vehicle.name);
-        if (priceRef.current) priceRef.current.value = String(vehicle.price);
-        if (yearRef.current) yearRef.current.value = String(vehicle.year);
-        if (kmRef.current) kmRef.current.value = String(vehicle.km);
-        if (descriptionRef.current) descriptionRef.current.value = vehicle.description;
-        if (optionsRef.current) optionsRef.current.value = vehicle.options;
-        if (plateRef.current) plateRef.current.value = vehicle.plate || "";
-        if (gearboxRef.current) gearboxRef.current.value = vehicle.gearbox;
-        if (typeRef.current) typeRef.current.value = vehicle.type;
-        if (statusRef.current) statusRef.current.value = vehicle.status;
-        
-        if (isLeilaoRef.current) isLeilaoRef.current.checked = vehicle.isLeilao;
-        if (isIpvaPagoRef.current) isIpvaPagoRef.current.checked = vehicle.isIpvaPago;
-        if (isAlienadoRef.current) isAlienadoRef.current.checked = vehicle.isAlienado;
-        if (isGarantiaRef.current) isGarantiaRef.current.checked = vehicle.isGarantia;
+      try {
+        const v = await getVehicleById(id);
+        if (v) {
+          setName(v.name);
+          setPrice(String(v.price));
+          setYear(String(v.year));
+          setKm(String(v.km));
+          setGearbox(v.gearbox);
+          setType(v.type);
+          setStatus(v.status);
+          setPlate(v.plate || "");
+          setOptions(v.options || "");
+          setDescription(v.description || "");
+          
+          setIsLeilao(!!v.isLeilao);
+          setIsIpvaPago(!!v.isIpvaPago);
+          setIsAlienado(!!v.isAlienado);
+          setIsGarantia(!!v.isGarantia);
 
-        try {
-          const images = JSON.parse(vehicle.images);
-          setPreviewUrls(images);
-        } catch (e) {
-          console.error("Error parsing images", e);
+          try {
+            const imgs = JSON.parse(v.images);
+            setPreviewUrls(imgs);
+          } catch (e) {
+            console.error("Error parsing images", e);
+          }
         }
+      } catch (err) {
+        console.error("Error loading vehicle", err);
+      } finally {
+        setFetching(false);
       }
-      setFetching(false);
     }
     loadVehicle();
   }, [id]);
 
+  // FIPE API Logics
   useEffect(() => {
-    setSelectedBrand("");
-    setSelectedModel("");
-    setBrands([]);
-    setModels([]);
     fetch(`https://parallelum.com.br/fipe/api/v1/${apiType}/marcas`)
       .then(res => res.json())
       .then(data => setBrands(data))
@@ -111,7 +102,7 @@ export default function EditarVeiculoPage() {
        const m = models.find(x => String(x.codigo) === String(selectedModel))?.nome || "";
        if (b && m) {
            let cleanBrand = b.replace("VW - ", ""); 
-           setVehicleName(`${cleanBrand} ${m}`.split(" ").slice(0, 5).join(" "));
+           setName(`${cleanBrand} ${m}`.split(" ").slice(0, 5).join(" "));
        }
     }
   }, [selectedModel, selectedBrand, brands, models]);
@@ -120,7 +111,6 @@ export default function EditarVeiculoPage() {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
       const urls = filesArray.map(file => URL.createObjectURL(file));
-      // Keep existing preview URLs when updating
       setPreviewUrls(prev => [...prev, ...urls]);
     }
   };
@@ -161,28 +151,21 @@ export default function EditarVeiculoPage() {
     });
   };
  
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    
     setLoading(true);
     setUploadStatus("Processando alterações...");
 
     try {
-      const imagesInput = form.querySelector('input[name="images"]') as HTMLInputElement;
-      const files = imagesInput?.files ? Array.from(imagesInput.files) : [];
-      
-      // We keep existing URLs that were already there
+      const fileInput = document.querySelector('input[name="images"]') as HTMLInputElement;
+      const files = fileInput?.files ? Array.from(fileInput.files) : [];
       const existingUrls = previewUrls.filter(url => url.startsWith("http"));
       const imageUrls: string[] = [...existingUrls];
 
-      // 1. Upload only NEW images
       if (files.length > 0) {
         for (let i = 0; i < files.length; i++) {
-          setUploadStatus(`Otimizando nova foto ${i + 1} de ${files.length}...`);
-          const fileToUpload = await compressImage(files[i]);
           setUploadStatus(`Subindo nova foto ${i + 1} de ${files.length}...`);
+          const fileToUpload = await compressImage(files[i]);
           const imageFormData = new FormData();
           imageFormData.append("image", fileToUpload);
           const uploadResult = await uploadVehicleImage(imageFormData);
@@ -194,20 +177,20 @@ export default function EditarVeiculoPage() {
       setUploadStatus("Atualizando registro...");
 
       const vehicleData = {
-        name: formData.get("name") as string,
-        price: Number(formData.get("price")),
-        year: Number(formData.get("year")),
-        km: Number(formData.get("km")),
-        gearbox: formData.get("gearbox") as string,
-        type: formData.get("type") as string,
-        options: formData.get("options") as string,
-        description: formData.get("description") as string,
-        status: formData.get("status") as string,
-        isLeilao: formData.get("isLeilao") === "on",
-        isIpvaPago: formData.get("isIpvaPago") === "on",
-        isAlienado: formData.get("isAlienado") === "on",
-        isGarantia: formData.get("isGarantia") === "on",
-        plate: formData.get("plate") as string,
+        name,
+        price: Number(price),
+        year: Number(year),
+        km: Number(km),
+        gearbox,
+        type,
+        options,
+        description,
+        status,
+        isLeilao,
+        isIpvaPago,
+        isAlienado,
+        isGarantia,
+        plate,
         imageUrls
       };
  
@@ -233,10 +216,10 @@ export default function EditarVeiculoPage() {
       const res = await fetch("/api/gerar-descricao", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: vehicleName, year: yearRef.current?.value, km: kmRef.current?.value, options: optionsRef.current?.value, style })
+        body: JSON.stringify({ name, year, km, options, style })
       });
       const data = await res.json();
-      if (data.success && descriptionRef.current) descriptionRef.current.value = data.text;
+      if (data.success) setDescription(data.text);
     } catch (e) {} finally { setAiLoading(false); }
   };
 
@@ -284,33 +267,33 @@ export default function EditarVeiculoPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Nome do Veículo *</label>
-            <input required type="text" name="name" value={vehicleName} onChange={e => setVehicleName(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
+            <input required type="text" value={name} onChange={e => setName(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
           </div>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Preço (R$) *</label>
-            <input ref={priceRef} step="0.01" required type="number" name="price" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
+            <input required type="number" value={price} onChange={e => setPrice(e.target.value)} step="0.01" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
           </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Placa (Opcional)</label>
-            <input ref={plateRef} type="text" name="plate" placeholder="Ex: ABC-1234" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
+            <input type="text" value={plate} onChange={e => setPlate(e.target.value)} placeholder="Ex: ABC-1234" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
           </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Ano *</label>
-            <input ref={yearRef} required type="number" name="year" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
+            <input required type="number" value={year} onChange={e => setYear(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
           </div>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>KM *</label>
-            <input ref={kmRef} required type="number" name="km" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
+            <input required type="number" value={km} onChange={e => setKm(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
           </div>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Câmbio *</label>
-            <select ref={gearboxRef} required name="gearbox" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+            <select required value={gearbox} onChange={e => setGearbox(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
               <option value="Automático">Automático</option>
               <option value="Manual">Manual</option>
             </select>
@@ -320,7 +303,7 @@ export default function EditarVeiculoPage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "16px" }}>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Tipo *</label>
-            <select ref={typeRef} required name="type" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+            <select required value={type} onChange={e => setType(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
               <option value="sedan">Sedan</option>
               <option value="hatch">Hatch</option>
               <option value="SUV">SUV</option>
@@ -330,31 +313,30 @@ export default function EditarVeiculoPage() {
           </div>
           <div>
             <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Status *</label>
-            <select ref={statusRef} required name="status" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
+            <select required value={status} onChange={e => setStatus(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }}>
               <option value="disponivel">Disponível</option>
               <option value="vendido">Vendido</option>
             </select>
           </div>
         </div>
 
-        {/* Checkboxes */}
         <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
           <h3 style={{ fontSize: "1rem", fontWeight: "700", color: "#334155", marginBottom: "16px" }}>Características Adicionais</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
             <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <input ref={isIpvaPagoRef} type="checkbox" name="isIpvaPago" style={{ width: "18px", height: "18px" }} />
+              <input type="checkbox" checked={isIpvaPago} onChange={e => setIsIpvaPago(e.target.checked)} style={{ width: "18px", height: "18px" }} />
               <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>📄 IPVA Pago</span>
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <input ref={isLeilaoRef} type="checkbox" name="isLeilao" style={{ width: "18px", height: "18px" }} />
+              <input type="checkbox" checked={isLeilao} onChange={e => setIsLeilao(e.target.checked)} style={{ width: "18px", height: "18px" }} />
               <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>🔨 Leilão</span>
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <input ref={isAlienadoRef} type="checkbox" name="isAlienado" style={{ width: "18px", height: "18px" }} />
+              <input type="checkbox" checked={isAlienado} onChange={e => setIsAlienado(e.target.checked)} style={{ width: "18px", height: "18px" }} />
               <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>🏦 Alienado</span>
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer", padding: "10px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-              <input ref={isGarantiaRef} type="checkbox" name="isGarantia" style={{ width: "18px", height: "18px" }} />
+              <input type="checkbox" checked={isGarantia} onChange={e => setIsGarantia(e.target.checked)} style={{ width: "18px", height: "18px" }} />
               <span style={{ fontSize: "0.9rem", fontWeight: "600" }}>🛡️ Garantia</span>
             </label>
           </div>
@@ -362,7 +344,7 @@ export default function EditarVeiculoPage() {
 
         <div>
           <label style={{ display: "block", fontSize: "0.95rem", fontWeight: "600", marginBottom: "8px" }}>Opcionais</label>
-          <input ref={optionsRef} type="text" name="options" style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
+          <input type="text" value={options} onChange={e => setOptions(e.target.value)} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)" }} />
         </div>
 
         <div>
@@ -374,7 +356,7 @@ export default function EditarVeiculoPage() {
                <button type="button" onClick={() => generateAI("premium")} style={{ background: "white", padding: "8px 12px", borderRadius: "6px", fontSize: "0.8rem", border: "1px solid #8E24AA", cursor: "pointer" }}>IA Premium</button>
             </div>
           </div>
-          <textarea ref={descriptionRef} required name="description" rows={6} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "1rem" }} />
+          <textarea required value={description} onChange={e => setDescription(e.target.value)} rows={6} style={{ width: "100%", padding: "14px", borderRadius: "8px", border: "1px solid var(--border-color)", fontSize: "1rem" }} />
         </div>
 
         <div style={{ background: "var(--bg-color)", padding: "20px", borderRadius: "8px", border: "1px dashed var(--border-color)" }}>
