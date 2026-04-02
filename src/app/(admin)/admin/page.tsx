@@ -54,7 +54,7 @@ export default async function AdminDashboardPage() {
 
             return (
               <div key={v.id} className={styles.vehicleCard}>
-                <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.cardClickableArea}>
+                <Link href={`/catalogo/${v.id}`} className={styles.cardClickableArea} target="_blank">
                   <div className={styles.cardMain}>
                     {/* Left: Image Section */}
                     <div className={styles.imageSection}>
@@ -89,7 +89,12 @@ export default async function AdminDashboardPage() {
                       </div>
 
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "auto" }}>
-                        <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
+                         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>{v.type.toUpperCase()}</span>
+                            <Link href={`/admin/veiculos/editar/${v.id}`} className={styles.editBtn}>
+                                <Plus size={14} /> Editar Veículo
+                            </Link>
+                         </div>
                         <span style={{ fontSize: "1rem", fontWeight: "800", color: "#1e293b" }}>{formatCurrency(v.price)}</span>
                       </div>
                     </div>
