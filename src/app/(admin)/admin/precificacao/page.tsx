@@ -49,8 +49,41 @@ function PricingContent() {
   }, [searchParams]);
   
   const [rawPrices, setRawPrices] = useState("");
-  const [analysis, setAnalysis] = useState<PricingAnalysis | null>(null);
-  const [error, setError] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleAISearch = async () => {
+    if (!input.veiculo || !input.ano) {
+      setError("Preencha o Nome e Ano para que a IA possa pesquisar o mercado.");
+      return;
+    }
+    
+    setError("");
+    setIsSearching(true);
+    
+    try {
+      const res = await fetch("/api/precificacao/search-market", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: input.veiculo, year: input.ano })
+      });
+      
+      const data = await res.json();
+      
+      if (data.success) {
+        const prices = data.prices.join(", ");
+        setRawPrices(prices);
+      } else if (data.needsApiKey) {
+        setError(`⚠️ ${data.message} (Exemplos carregados: ${data.mockData.join(", ")})`);
+        setRawPrices(data.mockData.join(", "));
+      } else {
+        throw new Error(data.error || "Erro desconhecido na busca IA.");
+      }
+    } catch (err: any) {
+      setError("Falha na Pesquisa IA: " + err.message);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const handleAnalyze = () => {
     setError("");
@@ -127,12 +160,35 @@ function PricingContent() {
               <input type="number" placeholder="Quanto vale na tabela?" value={input.fipe || ""} onChange={e => setInput({...input, fipe: Number(e.target.value)})} style={{ ...inputStyle, fontWeight: "700", color: "#3b82f6" }} />
             </div>
 
-            <div>
+            <div style={{ position: "relative" }}>
               <label style={labelStyle}>Preços de Mercado (Analise Concorrente)</label>
+              <button 
+                onClick={handleAISearch}
+                disabled={isSearching}
+                style={{ 
+                  position: "absolute", 
+                  top: 0, 
+                  right: 0, 
+                  fontSize: "0.75rem", 
+                  background: "#eff6ff", 
+                  color: "#2563eb", 
+                  border: "1px solid #bfdbfe", 
+                  padding: "4px 8px", 
+                  borderRadius: "6px", 
+                  cursor: "pointer",
+                  fontWeight: "700",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px"
+                }}
+              >
+                 {isSearching ? <RefreshCcw size={12} className="spin" /> : <Search size={12} />} 
+                 {isSearching ? "Pesquisando IA..." : "🔍 Pesquisa IA"}
+              </button>
               <textarea placeholder="Ex: 85000, 89900, 87500, 92000..." value={rawPrices} onChange={e => setRawPrices(e.target.value)} rows={5} style={{ ...inputStyle, resize: "none" }} />
             </div>
 
-            {error && <div style={{ padding: "12px", background: "#fef2f2", color: "#991b1b", borderRadius: "8px", fontSize: "0.85rem", border: "1px solid #fee2e2" }}><strong>Erro:</strong> {error}</div>}
+            {error && <div style={{ padding: "12px", background: "#fef2f2", color: "#991b1b", borderRadius: "8px", fontSize: "0.85rem", border: "1px solid #fee2e2" }}><strong>Atenção:</strong> {error}</div>}
 
             <button onClick={handleAnalyze} style={{ background: "#0f172a", color: "white", border: "none", padding: "16px", borderRadius: "12px", fontSize: "1rem", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px" }}>
               <BarChart3 size={20} /> Gerar Análise Especialista
