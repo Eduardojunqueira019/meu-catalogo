@@ -20,6 +20,9 @@ export default async function AdminDashboardPage() {
       <header className={styles.adminHeader}>
         <div className={styles.titleLine}>
           <h1 className={styles.pageTitle}>Veículos</h1>
+          <Link href="/admin/integrador" className="btn-primary" style={{ display: "flex", alignItems: "center", gap: "8px", padding: "8px 16px", borderRadius: "8px", textDecoration: "none", fontSize: "14px", fontWeight: "600", backgroundColor: "var(--primary)", color: "white" }}>
+            <Share2 size={16} /> Integrador de Anúncios
+          </Link>
         </div>
 
         <div className={styles.searchToolbar}>
