@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { CarFront, LayoutDashboard, Users, User, Menu, X, Share2, Megaphone, CheckSquare, Settings, Bell, ChevronDown } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { CarFront, LayoutDashboard, Users, User, Menu, X, Share2, Megaphone, CheckSquare, Settings, Bell, ChevronDown, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import LeadNotifier from "@/components/admin/LeadNotifier";
+import { getProfile } from "@/app/actions/profileActions";
 
 export default function AdminLayout({
   children,
@@ -11,7 +12,16 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [profile, setProfile] = useState<{name: string, photoUrl: string}>({ name: "Eduardo", photoUrl: "/placeholder-user.jpg" });
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    getProfile().then(p => {
+       if(p) setProfile({ name: p.name, photoUrl: p.photoUrl || "/placeholder-user.jpg" });
+    });
+  }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
@@ -19,7 +29,7 @@ export default function AdminLayout({
   const navItems = [
     { name: "Dashboard", href: "/admin", icon: CheckSquare },
     { name: "Veículos", href: "/admin/veiculos", icon: CarFront },
-    { name: "Integrador de Anúncios", href: "/admin/integrador", icon: Megaphone },
+    { name: "Integrador", href: "/admin/integrador", icon: Megaphone },
     { name: "Simulações", href: "#", icon: LayoutDashboard },
     { name: "Clientes", href: "/admin/leads", icon: User },
     { name: "Configurações", href: "/admin/perfil", icon: Settings },
@@ -31,10 +41,10 @@ export default function AdminLayout({
       
       {/* Mobile Header */}
       <header className="mobile-header">
-        <div className="logo-area">
+        <Link href="/admin" className="logo-area" style={{ color: "white", textDecoration: "none" }}>
           <CarFront size={22} color="white" />
-          <span>SeuCatálogo</span>
-        </div>
+          <span>SeuEstoque</span>
+        </Link>
         <button onClick={toggleSidebar} className="menu-btn">
           <Menu size={24} />
         </button>
@@ -45,13 +55,13 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-logo">
+        <Link href="/admin" className="sidebar-logo" style={{ color: "white", textDecoration: "none" }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L2 12L12 22L22 12L12 2Z" fill="white"/>
             <path d="M12 8L8 12L12 16L16 12L12 8Z" fill="#3b82f6"/>
           </svg>
-          <span>SeuCatálogo</span>
-        </div>
+          <span>SeuEstoque</span>
+        </Link>
         
         <nav className="sidebar-nav">
           {navItems.map((item) => {
@@ -88,17 +98,29 @@ export default function AdminLayout({
              <button className="icon-btn">
                <Bell size={20} strokeWidth={2.5} />
              </button>
-             <div className="user-profile">
-               <div className="avatar">
-                 <img src="/placeholder-user.jpg" alt="User" />
+             <div style={{ position: "relative" }}>
+               <div className="user-profile" onClick={() => setShowUserMenu(!showUserMenu)}>
+                 <div className="avatar">
+                   <img src={profile.photoUrl} alt="User" />
+                 </div>
+                 <span className="user-name">{profile.name.split(" ")[0]}</span>
+                 <ChevronDown size={16} />
                </div>
-               <span className="user-name">André</span>
-               <ChevronDown size={16} />
+               
+               {showUserMenu && (
+                 <div style={{ position: "absolute", top: "45px", right: "0", background: "white", borderRadius: "8px", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", overflow: "hidden", zIndex: 100, minWidth: "150px" }}>
+                   <form action="/api/logout" method="POST">
+                     <button type="submit" style={{ width: "100%", padding: "12px 16px", display: "flex", alignItems: "center", gap: "8px", background: "transparent", border: "none", color: "#ef4444", cursor: "pointer", fontSize: "14px", fontWeight: "500", textAlign: "left" }}>
+                       <LogOut size={16} /> Sair
+                     </button>
+                   </form>
+                 </div>
+               )}
              </div>
            </div>
         </header>
 
-        <div className="page-content">
+        <div className="page-content" onClick={() => showUserMenu && setShowUserMenu(false)}>
            {children}
         </div>
       </main>
@@ -110,7 +132,6 @@ export default function AdminLayout({
           min-height: 100vh;
         }
         
-        /* Mobile Header */
         .mobile-header {
           display: none;
           justify-content: space-between;
@@ -123,9 +144,8 @@ export default function AdminLayout({
           z-index: 50;
         }
         .logo-area { display: flex; gap: 8px; align-items: center; font-weight: bold; font-size: 1.2rem; }
-        .menu-btn { background: transparent; border: none; color: white; }
+        .menu-btn { background: transparent; border: none; color: white; cursor: pointer; }
         
-        /* Sidebar */
         .sidebar {
           width: 250px;
           background-color: #2b3a4a;
@@ -168,7 +188,6 @@ export default function AdminLayout({
         .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
         .nav-item.active { background-color: #3165b5; color: white; font-weight: 600; }
         
-        /* Main Content */
         .main-content {
           flex: 1;
           display: flex;
@@ -207,8 +226,10 @@ export default function AdminLayout({
           align-items: center;
           gap: 10px;
           cursor: pointer;
+          user-select: none;
         }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; }
+        .user-profile:hover { opacity: 0.8; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; background: #e2e8f0; }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
         .user-name { font-weight: 600; color: #1e293b; font-size: 14px; }
         
