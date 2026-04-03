@@ -1,0 +1,189 @@
+.dashboardContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KPI Cards */
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 20px;
+}
+@media (min-width: 640px) { .kpiGrid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .kpiGrid { grid-template-columns: repeat(4, 1fr); } }
+
+.kpiCard {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kpiIconWrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #eff6ff; /* Default blue tint */
+  color: #3b82f6;
+}
+.kpiIconWrapper.green { background-color: #dcfce7; color: #22c55e; }
+
+.kpiTitle { font-size: 14px; color: #64748b; font-weight: 500; margin: 0; }
+.kpiValue { font-size: 28px; font-weight: 700; color: #0f172a; margin: 0; }
+
+/* Main Content Grid */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1200px) {
+  .mainGrid {
+    grid-template-columns: 2.2fr 1fr; /* Vehicles takes more space than Integrador */
+  }
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 16px;
+}
+
+/* Vehicles List Container */
+.vehiclesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Highlighted horizontal card */
+.highlightCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .highlightCard { flex-direction: row; }
+}
+
+.highlightImageWrapper {
+  width: 100%;
+  height: 200px;
+  background: #f1f5f9;
+}
+@media (min-width: 768px) {
+  .highlightImageWrapper { width: 45%; height: auto; }
+}
+.highlightImageWrapper img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.highlightInfo {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .highlightInfo { width: 55%; }
+}
+
+.vehicleName { font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 4px 0; }
+.vehiclePrice { font-size: 20px; font-weight: 500; color: #334155; margin: 0 0 16px 0; }
+
+.vehicleTags { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.vTag { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+.vTagGreen { background: #16a34a; color: white; }
+.vTagBlue { background: #2563eb; color: white; }
+.vTagGray { background: #f1f5f9; color: #64748b; }
+
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+.btnOutline {
+  background: white; border: 1px solid #cbd5e1; color: #475569; padding: 8px 16px; border-radius: 6px; font-weight: 500; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
+}
+.btnOutline:hover { background: #f8fafc; }
+
+.btnSolid {
+  background: #2563eb; border: none; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 500; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s;
+}
+.btnSolid:hover { background: #1d4ed8; }
+.btnGreen { background: #16a34a; }
+.btnGreen:hover { background: #15803d; }
+
+/* Secondary Vehicles Grid */
+.secondaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.smallCard {
+  background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-direction: column;
+}
+
+.smallImage { width: 100%; height: 140px; background: #f1f5f9; }
+.smallImage img { width: 100%; height: 100%; object-fit: cover; }
+
+.smallInfo { padding: 16px; display: flex; flex-direction: column; flex: 1; }
+.smallName { font-size: 14px; font-weight: 600; color: #1e293b; margin: 0 0 4px 0; }
+.smallPrice { font-size: 14px; color: #475569; margin: 0 0 16px 0; }
+
+.smallActions { display: flex; gap: 8px; margin-top: auto; }
+.smallActions button { flex: 1; justify-content: center; padding: 8px; font-size: 13px; }
+
+/* Integrador Widget Area */
+.widgetCard {
+  background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 20px;
+}
+
+.widgetTitle { font-size: 16px; font-weight: 700; color: #334155; margin: 0 0 16px 0; }
+
+.widgetList { display: flex; flex-direction: column; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+
+.widgetItem {
+  display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #e2e8f0;
+}
+.widgetItem:last-child { border-bottom: none; }
+
+.widgetItemLeft { display: flex; align-items: center; gap: 12px; }
+.widgetItemCheckbox { accent-color: #2563eb; width: 16px; height: 16px; cursor: pointer; }
+
+.widgetItemDetails { display: flex; flex-direction: column; }
+.wName { font-size: 14px; font-weight: 600; color: #1e293b; }
+.wPrice { font-size: 13px; color: #64748b; }
+
+.widgetItemRight { display: flex; align-items: center; gap: 6px; }
+.socialIcon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; border-radius: 4px; color: white; font-size: 12px; }
+.socialWpp { background: #22c55e; }
+.socialFb { background: #3b5998; }
+.socialOff { border: 1px solid #cbd5e1; background: white; }
+
+.btnPublishAll {
+  width: 100%; background: #16a34a; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 20px;
+}
+.btnPublishAll:hover:not(:disabled) { background: #15803d; }
+.btnPublishAll:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+.previewBox {
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; font-size: 13px; color: #334155;
+}
+.previewTitle { font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.previewText { line-height: 1.6; display: flex; flex-direction: column; gap: 8px; }
+.previewLink { color: #2563eb; font-weight: 500; word-break: break-all; }
